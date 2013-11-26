@@ -1,0 +1,308 @@
+// ProtocolLibrary.idl : IDL source for ProtocolLibrary
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ProtocolLibrary.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "exdisp.idl";
+import "dispex.idl";
+
+[
+	uuid(E8A099E5-DEC2-45F9-BDE3-3E82629AEF6B),
+	version(1.0),
+]
+library protocolpatchLib
+{
+	//importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+  typedef enum Scheme {
+    SCHEME_HTTP,
+    SCHEME_HTTP_S,
+    SCHEME_COUNT
+  } Scheme;
+
+  [
+	  object,
+	  uuid(E05C2293-69F9-4C3E-AE5F-15B4CE78E42C),
+	  pointer_default(unique)
+  ]
+  interface IHeaders : IUnknown
+  {
+    HRESULT get([in] BSTR aName, [out, retval] BSTR * aRetVal);
+    HRESULT set([in] BSTR aName, [in] BSTR aValue);
+  };
+
+  [
+	  object,
+	  uuid(64FF248B-5918-4DB2-B2F3-81AC5D10D990),
+	  dual,
+	  nonextensible,
+	  pointer_default(unique)
+  ]
+  interface IResponse : IDispatch
+  {
+    [propget, id(1), helpstring(
+      "Property result. The HTTP result code."
+    )]
+    HRESULT result([out, retval] ULONG * aRetVal);
+
+    [propget, id(2), helpstring(
+      "Property headers. The headers for this response."
+    )]
+    HRESULT headers([out, retval] IDispatchEx ** aRetVal);
+
+  };
+
+  [
+	  object,
+	  uuid(FBB83EAB-1913-40DC-B62A-83C308CE05FF),
+	  dual,
+	  nonextensible,
+	  pointer_default(unique)
+  ]
+  interface IRequest : IDispatch
+  {
+    [propget, id(1), helpstring(
+      "Property requestId. The id of this request."
+    )]
+    HRESULT requestId([out, retval] LONG * aRetVal);
+
+    [propget, id(2), helpstring(
+      "Property currentBrowser. The browser for this request."
+    )]
+    HRESULT currentBrowser([out, retval] IWebBrowser2 ** aRetVal);
+
+    [propget, id(4), helpstring(
+      "Property headers. The headers for this request."
+    )]
+    HRESULT headers([out, retval] IDispatchEx ** aRetVal);
+
+    [propget, id(5), helpstring(
+      "Property uri. The current URI as a string."
+    )]
+    HRESULT uri([out, retval] BSTR * aRetVal);
+
+    [propget, id(6), helpstring(
+      "Property verb. The current request method."
+    )]
+    HRESULT verb([out, retval] BSTR * aRetVal);
+
+    [propget, id(7), helpstring(
+      "Property response. The response of the current request."
+    )]
+    HRESULT response([out, retval] IResponse ** aRetVal);
+
+    [id(100), helpstring(
+      "isDocumentRequest. Returns S_FALSE if this request is for a resource other than a document."
+    )]
+    HRESULT isDocumentRequest();
+
+    [id(101), helpstring(
+      "isSubFrame. Returns S_FALSE if this request is for the root frame."
+    )]
+    HRESULT isSubFrame();
+
+    [id(102), helpstring(
+      "redirect"
+    )]
+    HRESULT redirect([in] BSTR aNewUri);
+
+    [id(103), helpstring(
+      "cancel"
+    )]
+    HRESULT cancel();
+
+    [id(200), restricted, helpstring(
+      "getIUri"
+    )]
+    HRESULT getIUri([out, retval] IUri ** aRetVal);
+
+    [id(201), restricted, helpstring(
+      "getRedirectUri"
+    )]
+    HRESULT getRedirectUri([out, retval] IUri ** aRetVal);
+
+    [id(202), restricted, helpstring(
+      "isCanceled"
+    )]
+    HRESULT isCanceled();
+  };
+
+  [
+	  object,
+	  uuid(BB558246-5A8B-4680-8FCA-690D95A93DC5),
+    oleautomation,
+	  pointer_default(unique)
+  ]
+  interface IWebRequestEvents : IUnknown
+  {
+    HRESULT onBeforeRequest([in] IRequest * aRequest);
+    HRESULT onBeforeSendHeaders([in] IRequest * aRequest);
+    HRESULT onBeforeRedirect([in] IRequest * aRequest);
+    HRESULT onHeadersReceived([in] IRequest * aRequest);
+    HRESULT onInteractive([in] IRequest * aRequest);
+    HRESULT onCompleted([in] IRequest * aRequest);
+  };
+
+  [
+	  object,
+	  uuid(158C327F-B884-442B-B95F-F2EE19228ABC),
+    oleautomation,
+	  pointer_default(unique)
+  ]
+  interface IResourceRequestEvents : IWebRequestEvents
+  {
+  };
+/*
+  [
+	  object,
+	  uuid(72FDD8C5-80BC-4D58-9558-12E1B8891D13),
+    oleautomation,
+	  pointer_default(unique)
+  ]
+  interface IRequestEventSource : IUnknown
+  {
+    HRESULT fire_onBeforeRequest([in] IRequest * aRequest, [out, retval] VARIANT * aRetVal);
+    HRESULT fire_onBeforeRedirect([in] IRequest * aRequest, [out, retval] VARIANT * aRetVal);
+    HRESULT fire_onHeadersReceived([in] IRequest * aRequest, [out, retval] VARIANT * aRetVal);
+    HRESULT fire_onInteractive([in] IRequest * aRequest, [out, retval] VARIANT * aRetVal);
+    HRESULT fire_onCompleted([in] IRequest * aRequest, [out, retval] VARIANT * aRetVal);
+  };
+*/
+  [
+	  object,
+	  uuid(C1DBC8E5-E10E-4FB1-86BB-0C4B2B93ACB6),
+	  pointer_default(unique)
+  ]
+  interface IFrameRecord : IUnknown
+  {
+    HRESULT cleanup();
+    HRESULT beforeNavigate([in] LPCWSTR aUrl, [in] IWebBrowser2 * aBrowser);
+    HRESULT setUri([in] LPCWSTR aNewUri);
+    HRESULT getBrowser([out, retval] IWebBrowser2 ** aRetVal);
+    HRESULT getUri([out, retval] IUri ** aRetVal);
+    HRESULT getSink([out, retval] IWebRequestEvents ** aRetVal);
+    HRESULT isTopLevel();
+    HRESULT isEqualUri([in] IUri * aUri);
+//    HRESULT findAndSetFrame([in] IUri * aUri);
+  };
+
+  [
+	  object,
+	  uuid(633EAB4E-979B-4BF1-8525-4E7720EBCF4C),
+	  pointer_default(unique)
+  ]
+  interface IThreadRecord : IUnknown
+  {
+    HRESULT cleanup();
+    HRESULT getToplevel([out, retval] IFrameRecord ** aRetVal);
+    HRESULT getCurrent([out, retval] IFrameRecord ** aRetVal);
+    HRESULT getForUri([in] IUri * aUri, [out, retval] IFrameRecord ** aRetVal);
+    HRESULT watchBrowser([in] IWebBrowser2 * aBrowser, [in] IWebRequestEvents * aEvents);
+    HRESULT unwatchBrowser([in] IWebBrowser2 * aBrowser, [in] IWebRequestEvents * aEvents);
+  };
+
+  [
+	  object,
+	  uuid(6FCABF5C-26B1-4C01-A5CA-E8D0D9BA1A72),
+	  pointer_default(unique)
+  ]
+  interface IProtPatchApplication : IUnknown
+  {
+    HRESULT patchProtokol([in] Scheme aScheme);
+    HRESULT unpatchProtokol([in] Scheme aScheme);
+    HRESULT enableProtokol([in] Scheme aScheme, [in] BOOL aEnable);
+
+    //-------------------------------------------------------------------------
+    // registers a temporary file protocol of the form
+    // lpszScheme://lpszHost/
+    // where lpszFolder points to the root folder of this "server"
+    HRESULT RegisterTemporaryFolderHandler(
+      [in] LPCOLESTR lpszScheme,
+      [in] LPCOLESTR lpszHost,
+      [in] LPCOLESTR lpszFolder);
+
+    //-------------------------------------------------------------------------
+    // registers a temporary resource protocol of the form
+    // lpszScheme://lpszHost/
+    // where lpszResourceFileName points to the file (DLL or exe) holding the
+    // resources
+    HRESULT RegisterTemporaryResourceHandlerFile(
+      [in] LPCOLESTR lpszScheme,
+      [in] LPCOLESTR lpszHost,
+      [in] LPCOLESTR lpszResourceFileName);
+
+    //-------------------------------------------------------------------------
+    // registers a temporary resource protocol of the form
+    // lpszScheme://lpszHost/
+    // where hInstResources is a module handle of the file (DLL or exe) holding
+    // the resources
+    HRESULT RegisterTemporaryResourceHandlerInstance(
+      [in] LPCOLESTR   lpszScheme,
+      [in] LPCOLESTR   lpszHost,
+      [in] HINSTANCE hInstResources);
+
+    //-------------------------------------------------------------------------
+    // unregisters a file protocol previously registered with
+    // one of the RegisterTemporaryXXXHandler methods
+    HRESULT UnregisterTemporaryFolderHandler(
+      [in] LPCOLESTR lpszScheme,
+      [in] LPCOLESTR lpszHost);
+
+    //-------------------------------------------------------------------------
+    // unregisters a resource protocol previously registered with
+    // one of the RegisterTemporaryXXXHandler methods
+    HRESULT UnregisterTemporaryResourceHandler(
+      [in] LPCOLESTR lpszScheme,
+      [in] LPCOLESTR lpszHost);
+
+    //-------------------------------------------------------------------------
+    // adds a URL where the content resides in memory.
+    HRESULT AddResource(
+      [in] LPCOLESTR lpszURL,
+      [in] const void * lpData,
+      [in] DWORD dwLength,
+      [in] LPCOLESTR lpszMimeType);
+
+
+    HRESULT watchBrowser([in] IWebBrowser2* aWebBrowser, [in] IWebRequestEvents * aEvents);
+    HRESULT unwatchBrowser([in] IWebBrowser2* aWebBrowser, [in] IWebRequestEvents * aEvents);
+
+  };
+
+  [
+		uuid(0FF4FEF4-E052-4C30-A8B2-EE7FBECC908F)		
+	]
+	coclass ProtPatchApplication
+	{
+		[default] interface IProtPatchApplication;
+	};
+/*
+  [
+		uuid(2DAD3841-F004-4A90-900C-D7E12220C8F1)		
+	]
+	coclass Headers
+	{
+		[default] interface IHeaders;
+	};
+*/
+  [
+		uuid(D6256E0E-4F08-4F25-B93D-F0044044829D)		
+	]
+	coclass Request
+	{
+		[default] interface IRequest;
+	};
+
+  [
+		uuid(EC150E8F-84A9-4762-BFFF-7BB49C342565)		
+	]
+	coclass Response
+	{
+		[default] interface IResponse;
+	};
+};
+
