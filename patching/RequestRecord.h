@@ -11,6 +11,7 @@
 #include "Response.h"
 #include "FrameRecord.h"
 #include "Application.h"
+#include <memory>
 
 namespace protocolpatchLib
 {
