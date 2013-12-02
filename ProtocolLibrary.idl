@@ -26,13 +26,60 @@ library protocolpatchLib
 
   [
 	  object,
-	  uuid(E05C2293-69F9-4C3E-AE5F-15B4CE78E42C),
+	  uuid(E20A04CF-FEB7-414C-A455-90985D1A7E32),
+	  dual,
+	  nonextensible,
 	  pointer_default(unique)
   ]
-  interface IHeaders : IUnknown
+  interface IKVPair : IDispatch
   {
-    HRESULT get([in] BSTR aName, [out, retval] BSTR * aRetVal);
-    HRESULT set([in] BSTR aName, [in] BSTR aValue);
+    [propget, id(1), helpstring(
+      "Property key."
+    )]
+    HRESULT key([out, retval] BSTR * aRetVal);
+    [propput, id(1), helpstring(
+      "Property key."
+    )]
+    HRESULT key([in] BSTR aVal);
+
+    [propget, id(2), helpstring(
+      "Property val."
+    )]
+    HRESULT val([out, retval] BSTR * aRetVal);
+    [propput, id(2), helpstring(
+      "Property val."
+    )]
+    HRESULT val([in] BSTR aVal);
+
+    [id(3), helpstring(
+      "Method set."
+    )]
+    HRESULT set([in] BSTR aKey, [in] BSTR aVal);
+
+    [id(4), helpstring(
+      "Method get."
+    )]
+    HRESULT get([out] BSTR * aKeyOut, [out] BSTR * aValOut);
+  };
+
+  [
+	  object,
+	  uuid(E05C2293-69F9-4C3E-AE5F-15B4CE78E42C),
+	  dual,
+	  nonextensible,
+	  pointer_default(unique)
+  ]
+  interface IHeaders : IDispatch
+  {
+    [propget, id(1), helpstring(
+      "Property length."
+    )]
+    HRESULT length([out, retval] ULONG * aRetVal);
+
+    [id(2), helpstring(
+      "Method forEach."
+    )]
+    HRESULT forEach([in] IDispatch * aCallback, [in, optional] VARIANT aThis);
   };
 
   [
@@ -52,7 +99,7 @@ library protocolpatchLib
     [propget, id(2), helpstring(
       "Property headers. The headers for this response."
     )]
-    HRESULT headers([out, retval] IDispatchEx ** aRetVal);
+    HRESULT headers([out, retval] IHeaders ** aRetVal);
 
   };
 
@@ -78,7 +125,7 @@ library protocolpatchLib
     [propget, id(4), helpstring(
       "Property headers. The headers for this request."
     )]
-    HRESULT headers([out, retval] IDispatchEx ** aRetVal);
+    HRESULT headers([out, retval] IHeaders ** aRetVal);
 
     [propget, id(5), helpstring(
       "Property uri. The current URI as a string."

@@ -55,7 +55,7 @@ public:
 
   STDMETHOD(get_requestId)(LONG * aRetVal);
   STDMETHOD(get_currentBrowser)(IWebBrowser2 ** aRetVal);
-  STDMETHOD(get_headers)(IDispatchEx ** aRetVal);
+  STDMETHOD(get_headers)(IHeaders ** aRetVal);
   STDMETHOD(get_uri)(BSTR * aRetVal);
   STDMETHOD(get_verb)(BSTR * aRetVal);
   STDMETHOD(get_response)(IResponse ** aRetVal);
@@ -76,7 +76,7 @@ private:
   CComPtr<IUri> mUri;
   CComPtr<IUri> mRedirectUri;
   CComPtr<IWebBrowser2> mCurrentBrowser;
-  CComPtr<IDispatchEx> mHeaders;
+  CComPtr<IHeaders> mHeaders;
   CComPtr<IResponse> mResponse;
 };
 

@@ -17,14 +17,13 @@ namespace protocolpatchLib
 //  Static method, callback from parser, adds a new header field (name).
 int Headers::onHeaderField(http_parser * aParser, const char *aField, size_t aLength)
 {
-  Headers * _this = static_cast<Headers*>(aParser->data);
   if (aLength > MAXINT)
       { return -1; }
-  std::string value;
-  value.append(aField, aLength);
-  std::wstring valueW = CA2W(value.c_str());
-  _this->mNameIDs[valueW] = _this->mNextDispID;
-  _this->mNames[_this->mNextDispID] = valueW;
+  CStringA name;
+  LPSTR buffer = name.GetBuffer(aLength);
+  strcpy_s(buffer, aLength, aField);
+  name.ReleaseBuffer(aLength);
+  static_cast<Headers*>(aParser->data)->mKv.key = CA2W(name);
   return 0;
 }
 
@@ -33,25 +32,29 @@ int Headers::onHeaderField(http_parser * aParser, const char *aField, size_t aLe
 //  Static method, callback from parser, adds a new header value.
 int Headers::onHeaderValue(http_parser * aParser, const char *aField, size_t aLength)
 {
-  Headers * _this = static_cast<Headers*>(aParser->data);
   if (aLength > MAXINT)
       { return -1; }
-  std::string value;
-  value.append(aField, aLength);
-  _this->mValues[_this->mNextDispID] = CA2W(value.c_str());
-  _this->mNextDispID++;
+  CStringA value;
+  LPSTR buffer = value.GetBuffer(aLength);
+  strcpy_s(buffer, aLength, aField);
+  value.ReleaseBuffer(aLength);
+
+  Headers * pThis = static_cast<Headers*>(aParser->data);
+  HRESULT hr = S_OK;
+  CComPtr<IKVPair> pair = KVPair::createInstance(pThis->mKv.key, CA2W(value), hr);
+  pThis->mValues.push_back(pair);
   return 0;
 }
 
 //--------------------------------------------------------------------------
 // createInstance
 //  Static creator
-CComPtr<IDispatchEx> Headers::createInstance(LPCWSTR aHeaders, BOOL aIsResponse, HRESULT & hr)
+CComPtr<IHeaders> Headers::createInstance(LPCWSTR aHeaders, BOOL aIsResponse, HRESULT & hr)
 {
   _ComObject * newInstance = NULL;
   hr = _ComObject::CreateInstance(&newInstance);
   if (SUCCEEDED(hr)) {
-    CComPtr<IDispatchEx> owner(newInstance);
+    CComPtr<IHeaders> owner(newInstance);
     hr = newInstance->parse(aHeaders, aIsResponse);
     if (SUCCEEDED(hr)) {
       return owner;
@@ -66,10 +69,7 @@ CComPtr<IDispatchEx> Headers::createInstance(LPCWSTR aHeaders, BOOL aIsResponse,
 //  Called by createInstance only.
 HRESULT Headers::parse(LPCWSTR aHeaders, BOOL aIsResponse)
 {
-  mModified = FALSE;
   mValues.clear();
-  mNames.clear();
-  mNameIDs.clear();
 
   CStringA headers;
   if (!aIsResponse) {
@@ -93,57 +93,74 @@ HRESULT Headers::parse(LPCWSTR aHeaders, BOOL aIsResponse)
   return (HPE_OK == HTTP_PARSER_ERRNO(&parser)) ? S_OK : E_FAIL;
 }
 
-STDMETHODIMP Headers::get(BSTR aName, BSTR * aRetVal)
+//--------------------------------------------------------------------------
+// getHeaders
+HRESULT Headers::getHeaders(CStringW & aHeaders)
 {
-  DISPID did = 0;
-  HRESULT hr = getDispID(aName, &did);
-  if (FAILED(hr)) {
-    return hr;
-  }
-  CComVariant vt;
-  hr = getValue(did, &vt);
-  if (FAILED(hr)) {
-    return hr;
-  }
-  vt.ChangeType(VT_BSTR);
-  if (VT_BSTR != vt.vt) {
-    return DISP_E_TYPEMISMATCH;
-  }
-  return vt.CopyTo(aRetVal);
-}
+  aHeaders.Empty();
 
-STDMETHODIMP Headers::set(BSTR aName, BSTR aValue)
-{
-  DISPID did = 0;
-  HRESULT hr = getDispID(aName, &did, TRUE);
-  if (FAILED(hr)) {
-    return hr;
+  for (auto it = mValues.begin(); it != mValues.end(); ++it) {
+    CComBSTR key, value;
+    (*it)->get(&key, &value);
+    if (key.Length() && value.Length()) {
+      aHeaders += key;
+      aHeaders += L": ";
+      aHeaders += value;
+      aHeaders += L"\r\n";
+    }
   }
-  CComVariant vt(aValue);
-  return putValue(did, &vt);
+  return S_OK;
 }
 
 //--------------------------------------------------------------------------
-// getHeadersIfModified
-//  If the we were modified, replace the headers in pszAdditionalHeaders.
-//  If not, return S_FALSE and leave pszAdditionalHeaders unchanged.
-HRESULT Headers::getHeaders(CStringW & aHeaders)
+// get_length
+STDMETHODIMP Headers::get_length(ULONG * aRetVal)
 {
-  LOCKED_BLOCK();
-  if (!mModified) {
-    return S_FALSE;
+  if (!aRetVal) {
+    return E_POINTER;
   }
-  aHeaders.Empty();
+  (*aRetVal) = (ULONG)mValues.size();
+  return S_OK;
+}
 
-  for (MapName2DispId::iterator it = mNameIDs.begin();
-      it != mNameIDs.end(); ++it) {
-    MapDispId2Variant::iterator itValue = mValues.find(it->second);
-    if (itValue != mValues.end() && (VT_BSTR == itValue->second.vt)) {
-      aHeaders += it->first.c_str();
-      aHeaders += L": ";
-      aHeaders += itValue->second.bstrVal;
-      aHeaders += L"\r\n";
-    }
+/*
+//--------------------------------------------------------------------------
+// item
+STDMETHODIMP Headers::item(ULONG aIndex)
+{
+  if (aIndex >= (ULONG)mValues.size()) {
+    return DISP_E_BADINDEX;
+  }
+  return S_OK;
+}
+*/
+
+//--------------------------------------------------------------------------
+// forEach
+STDMETHODIMP Headers::forEach(IDispatch * aCallback, VARIANT aThis)
+{
+  if (!aCallback) {
+    return E_INVALIDARG;
+  }
+  KVPairVector tmp = mValues;
+
+  //                    this,  array, index,    value
+  CComVariant args[] = {aThis, this,  (ULONG)0, NULL};
+  DISPID namedArgs[] = {DISPID_THIS};
+  DISPPARAMS params  = {&args[1], NULL, _countof(args)-1, 0};
+
+  if (VT_DISPATCH == aThis.vt) {
+    params.rgvarg = args;
+    params.rgdispidNamedArgs = namedArgs;
+    params.cNamedArgs = 1;
+    params.cArgs++;
+  }
+
+  for (auto it = tmp.begin(); it != tmp.end(); ++it) {
+    args[2].ulVal++;
+    args[3] = (*it);
+    CComVariant vtResult;
+    aCallback->Invoke(DISPID_VALUE, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &params, &vtResult, NULL, NULL);
   }
   return S_OK;
 }

@@ -47,12 +47,12 @@ public:
   HRESULT initResponse(RequestRecord & aRecord, LPCWSTR aHeaders, DWORD aResponseCode, HRESULT aOnResponseResult);
 
   STDMETHOD(get_result)(ULONG * aRetVal);
-  STDMETHOD(get_headers)(IDispatchEx ** aRetVal);
+  STDMETHOD(get_headers)(IHeaders ** aRetVal);
 
 private:
   LONG mRequestId;
   DWORD mResponseCode;
-  CComPtr<IDispatchEx> mHeaders;
+  CComPtr<IHeaders> mHeaders;
 };
 
 OBJECT_ENTRY_NON_CREATEABLE_EX_AUTO(CLSID_Response, Response)

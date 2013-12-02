@@ -143,7 +143,7 @@ STDMETHODIMP Request::get_verb(BSTR * aRetVal)
   return S_OK;
 }
 
-STDMETHODIMP Request::get_headers(IDispatchEx ** aRetVal)
+STDMETHODIMP Request::get_headers(IHeaders ** aRetVal)
 {
   if (!aRetVal) {
     return E_POINTER;

@@ -46,7 +46,7 @@ STDMETHODIMP Response::get_result(ULONG * aRetVal)
   return S_OK;
 }
 
-STDMETHODIMP Response::get_headers(IDispatchEx ** aRetVal)
+STDMETHODIMP Response::get_headers(IHeaders ** aRetVal)
 {
   if (!aRetVal) {
     return E_POINTER;
