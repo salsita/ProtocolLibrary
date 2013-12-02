@@ -14,6 +14,9 @@
 namespace protocolpatchLib
 {
 
+typedef PassthroughAPP::CMetaFactory<PassthroughAPP::CComClassFactoryProtocol,
+  Protocol> MetaFactoryProtocol;
+
 //--------------------------------------------------------------------------
 // getInstance
 //  Singleton: Handled by COM.
@@ -31,15 +34,21 @@ CComPtr<IProtPatchApplication> Application::getInstance()
 //--------------------------------------------------------------------------
 // patchProtokol
 //  Patches protocol aScheme. Call as soon as possible.
-STDMETHODIMP Application::patchProtokol(Scheme aScheme)
+STDMETHODIMP Application::patchProtokol(Scheme aScheme, BOOL aUseVTablePatching)
 {
-  switch(aScheme) {
-    case SCHEME_HTTP:
-      return IInternetProtocolCFPatchHTTP::patch();
-    case SCHEME_HTTP_S:
-      return IInternetProtocolCFPatchHTTP_S::patch();
+  THandlerType type = (aUseVTablePatching) ? PATCH : PAPP;
+  if (NONE != mHandlerType && type != mHandlerType) {
+    return E_UNEXPECTED;  // already patched
   }
-  return E_INVALIDARG;
+  mHandlerType = type;
+  switch(mHandlerType) {
+    case PAPP:
+      return registerProtocolInternal(aScheme);
+    case PATCH:
+      return patchProtocolInternal(aScheme);
+
+  }
+  return E_INVALIDARG;  // not reached
 }
 
 //--------------------------------------------------------------------------
@@ -48,14 +57,13 @@ STDMETHODIMP Application::patchProtokol(Scheme aScheme)
 //  for completeness.
 STDMETHODIMP Application::unpatchProtokol(Scheme aScheme)
 {
-  HRESULT hr = E_INVALIDARG;
-  switch(aScheme) {
-    case SCHEME_HTTP:
-      return IInternetProtocolCFPatchHTTP::restore();
-    case SCHEME_HTTP_S:
-      return IInternetProtocolCFPatchHTTP_S::restore();
+  switch(mHandlerType) {
+    case PAPP:
+      return unregisterProtocolInternal(aScheme);
+    case PATCH:
+      return unpatchProtocolInternal(aScheme);
   }
-  return E_INVALIDARG;
+  return E_UNEXPECTED;  // if not patched
 }
 
 //--------------------------------------------------------------------------
@@ -63,6 +71,9 @@ STDMETHODIMP Application::unpatchProtokol(Scheme aScheme)
 //  Enables / disables protocol aScheme.
 STDMETHODIMP Application::enableProtokol(Scheme aScheme, BOOL aEnable)
 {
+  if (PATCH != mHandlerType) {
+    return E_UNEXPECTED;  // already patched
+  }
   switch(aScheme) {
     case SCHEME_HTTP:
       IInternetProtocolCFPatchHTTP::enable(aEnable);
@@ -165,9 +176,6 @@ STDMETHODIMP Application::watchBrowser(IWebBrowser2* aWebBrowser, IWebRequestEve
   if (!threadRecord) {
     return E_FAIL;
   }
-  // and add the handler
-  //CComQIPtr<IResourceRequestEvents> resourceEvents;
-  //mResourceRequestEvents;
   return threadRecord->watchBrowser(aWebBrowser, aEvents);
 }
 
@@ -189,6 +197,145 @@ STDMETHODIMP Application::unwatchBrowser(IWebBrowser2* aWebBrowser, IWebRequestE
     return ThreadRecord::remove();
   }
   return S_OK;
+}
+
+//--------------------------------------------------------------------------
+// watchAll
+//  Add an event handler for a certain top level browser.
+//  This is meant to be called as soon as a browser is available,
+//  so in a BHO in SetSite().
+STDMETHODIMP Application::watchAll(IWebRequestEvents * aEvents)
+{
+  // get or create a record for the current thread
+  CComPtr<IThreadRecord> threadRecord = ThreadRecord::get();
+  if (!threadRecord) {
+    threadRecord = ThreadRecord::create();
+  }
+  if (!threadRecord) {
+    return E_FAIL;
+  }
+  return threadRecord->watchAll(aEvents);
+}
+
+//--------------------------------------------------------------------------
+// unwatchAll
+//  Removes the event handler, and, if the last one, also the browser record
+//  from the global list.
+STDMETHODIMP Application::unwatchAll(IWebRequestEvents * aEvents)
+{
+  // get the record for the current thread
+  CComPtr<IThreadRecord> threadRecord = ThreadRecord::get();
+  if (!threadRecord) {
+    return E_FAIL;
+  }
+  // remove the handler
+  HRESULT hr = threadRecord->unwatchAll(aEvents);
+  if (S_OK == hr) {
+  // and if this was the last, remove the thread record
+    return ThreadRecord::remove();
+  }
+  return S_OK;
+}
+
+//--------------------------------------------------------------------------
+// patchProtocolInternal
+HRESULT Application::patchProtocolInternal(Scheme aScheme)
+{
+  switch(aScheme) {
+    case SCHEME_HTTP:
+      return IInternetProtocolCFPatchHTTP::patch();
+    case SCHEME_HTTP_S:
+      return IInternetProtocolCFPatchHTTP_S::patch();
+  }
+  return E_INVALIDARG;
+}
+
+//--------------------------------------------------------------------------
+// unpatchProtocolInternal
+HRESULT Application::unpatchProtocolInternal(Scheme aScheme)
+{
+  if (PATCH != mHandlerType) {
+    return E_UNEXPECTED;
+  }
+  switch(aScheme) {
+    case SCHEME_HTTP:
+      return IInternetProtocolCFPatchHTTP::restore();
+    case SCHEME_HTTP_S:
+      return IInternetProtocolCFPatchHTTP_S::restore();
+  }
+  return E_INVALIDARG;
+}
+
+//--------------------------------------------------------------------------
+// registerProtocolInternal
+HRESULT Application::registerProtocolInternal(Scheme aScheme)
+{
+  CComPtr<IInternetSession> internetSession;
+  HRESULT hr = CoInternetGetSession(0, &internetSession, 0);
+  if (FAILED(hr)) {
+    return hr;
+  }
+
+  switch(aScheme) {
+    case SCHEME_HTTP:
+      hr = MetaFactoryProtocol::CreateInstance(
+          SchemeTraits<SCHEME_HTTP>::getCLSID(),
+          &mClassFactoryHTTP);
+
+      if (SUCCEEDED(hr)) {
+        hr = internetSession->RegisterNameSpace(
+          mClassFactoryHTTP,
+          CLSID_NULL,
+          SchemeTraits<SCHEME_HTTP>::getSchemeName(),
+          0, 0, 0);
+      }
+      break;
+    case SCHEME_HTTP_S:
+      hr = MetaFactoryProtocol::CreateInstance(
+          SchemeTraits<SCHEME_HTTP_S>::getCLSID(),
+          &mClassFactoryHTTPS);
+
+      if (SUCCEEDED(hr)) {
+        hr = internetSession->RegisterNameSpace(
+          mClassFactoryHTTPS,
+          CLSID_NULL,
+          SchemeTraits<SCHEME_HTTP_S>::getSchemeName(),
+          0, 0, 0);
+      }
+      break;
+    default:
+      return E_INVALIDARG;
+  }
+  if (FAILED(hr)) {
+    return hr;
+  }
+  return S_OK;
+}
+
+//--------------------------------------------------------------------------
+// unregisterProtocolInternal
+HRESULT Application::unregisterProtocolInternal(Scheme aScheme)
+{
+  if (PAPP != mHandlerType) {
+    return E_UNEXPECTED;
+  }
+  CComPtr<IInternetSession> internetSession;
+  HRESULT hr = CoInternetGetSession(0, &internetSession, 0);
+  if (FAILED(hr)) {
+    return hr;
+  }
+
+  switch(aScheme) {
+    case SCHEME_HTTP:
+      internetSession->UnregisterNameSpace(mClassFactoryHTTP, SchemeTraits<SCHEME_HTTP>::getSchemeName());
+      mClassFactoryHTTP.Release();
+      return S_OK;
+    case SCHEME_HTTP_S:
+      internetSession->UnregisterNameSpace(mClassFactoryHTTPS, SchemeTraits<SCHEME_HTTP_S>::getSchemeName());
+      mClassFactoryHTTPS.Release();
+      return S_OK;
+  }
+  return E_INVALIDARG;
 }
 
 

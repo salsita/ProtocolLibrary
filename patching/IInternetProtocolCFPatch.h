@@ -8,15 +8,14 @@
 #include "VTablePatch.h"
 #include "Scheme.h"
 #include "Protocol.h"
-#include "papp/ProtocolCF.h"
 #include "ThreadRecord.h"
+#include "ClassFactories.h"
 
 namespace protocolpatchLib
 {
 
-typedef PassthroughAPP::CMetaFactory<PassthroughAPP::CComClassFactoryProtocol,
-  Protocol> MetaFactory;
-
+typedef PassthroughAPP::CMetaFactory<CComClassFactoryPatch,
+  Protocol> MetaFactoryPatch;
 
 /*============================================================================
  * class IInternetProtocolCFPatch
@@ -143,7 +142,7 @@ private:
   HRESULT getClassFactory(IClassFactory ** aRetVal)
   {
     if (!mClassFactory) {
-      HRESULT hr = MetaFactory::CreateInstance(TSchemeTraits::getCLSID(), &mClassFactory.p);
+      HRESULT hr = MetaFactoryPatch::CreateInstance(TSchemeTraits::getCLSID(), &mClassFactory.p);
       if (FAILED(hr)) {
         return hr;
       }

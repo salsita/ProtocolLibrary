@@ -102,6 +102,7 @@ source_group("papp\\Source Files" FILES ${${PROJECT_NAME}_SOURCES_PAPP})
 ### protocol patching source files
 set(${PROJECT_NAME}_HEADERS_PROT_PATCHING
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/Application.h"
+  "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/ClassFactories.h"
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/FrameRecord.h"
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/GlobalMap.h"
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/Headers.h"

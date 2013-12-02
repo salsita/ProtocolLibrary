@@ -7,34 +7,6 @@
 #include "stdafx.h"
 #include "Protocol.h"
 
-#ifdef _DEBUG
-# define DUMP_HEADERS(_s) \
-  if (_s) { \
-    CString s = _s, token; \
-    int curPos = 0; \
-    token = s.Tokenize(_T("\r\n"), curPos); \
-    while (!token.IsEmpty()) \
-    { \
-      ATLTRACE(_T("\t")); \
-      ATLTRACE(token); \
-      ATLTRACE(_T("\n")); \
-      token = s.Tokenize(_T("\r\n"), curPos); \
-    } \
-  }
-
-# define DUMP_URI(_s, _uri) \
-  { \
-    ATLASSERT(_uri); \
-    CComBSTR uri; \
-    _uri->GetAbsoluteUri(&uri); \
-    ATLTRACE(_s, uri); \
-  }
-
-#else
-# define DUMP_HEADERS
-# define DUMP_URI
-#endif
-
 //#define PAPPTRACE
 #define PAPPTRACE(...)   ATLTRACE(__FUNCTION__);ATLTRACE(_T(": "));ATLTRACE(__VA_ARGS__)
 

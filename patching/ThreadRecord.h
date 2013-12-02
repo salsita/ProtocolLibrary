@@ -8,6 +8,7 @@
 
 #include "GlobalMap.h"
 #include "FrameRecord.h"
+#include <map>
 
 namespace protocolpatchLib
 {
@@ -69,6 +70,8 @@ public:
   STDMETHOD(getForUri)(IUri * aUri, IFrameRecord ** aRetVal);
   STDMETHOD(watchBrowser)(IWebBrowser2 * aBrowser, IWebRequestEvents * aEvents);
   STDMETHOD(unwatchBrowser)(IWebBrowser2 * aBrowser, IWebRequestEvents * aEvents);
+  STDMETHOD(watchAll)(IWebRequestEvents * aEvents);
+  STDMETHOD(unwatchAll)(IWebRequestEvents * aEvents);
 
   // -------------------------------------------------------------------------
   // IWebRequestEvents methods
@@ -80,12 +83,16 @@ public:
   STDMETHOD(onCompleted)(IRequest * aRequest);
 
 private:
+  typedef std::map<DWORD_PTR, CComPtr<IWebRequestEvents> > WebRequestEventsMap;
+
+private:
   static CComPtr<IThreadRecord> createInstance();
   HRESULT init(IWebBrowser2 * aBrowser);
 
-  CComPtr<IFrameRecord>   mTopLevelFrame;
-  CComPtr<IFrameRecord>   mCurrentFrame;
-  CComPtr<IWebRequestEvents> mEvents;
+  CComPtr<IFrameRecord>       mTopLevelFrame;
+  CComPtr<IFrameRecord>       mCurrentFrame;
+  WebRequestEventsMap         mEvents;
+  //CComPtr<IWebRequestEvents>  mEvents;
 };
 
 } // namespace protocolpatchLib

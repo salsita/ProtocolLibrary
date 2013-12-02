@@ -156,22 +156,7 @@ library protocolpatchLib
   interface IResourceRequestEvents : IWebRequestEvents
   {
   };
-/*
-  [
-	  object,
-	  uuid(72FDD8C5-80BC-4D58-9558-12E1B8891D13),
-    oleautomation,
-	  pointer_default(unique)
-  ]
-  interface IRequestEventSource : IUnknown
-  {
-    HRESULT fire_onBeforeRequest([in] IRequest * aRequest, [out, retval] VARIANT * aRetVal);
-    HRESULT fire_onBeforeRedirect([in] IRequest * aRequest, [out, retval] VARIANT * aRetVal);
-    HRESULT fire_onHeadersReceived([in] IRequest * aRequest, [out, retval] VARIANT * aRetVal);
-    HRESULT fire_onInteractive([in] IRequest * aRequest, [out, retval] VARIANT * aRetVal);
-    HRESULT fire_onCompleted([in] IRequest * aRequest, [out, retval] VARIANT * aRetVal);
-  };
-*/
+
   [
 	  object,
 	  uuid(C1DBC8E5-E10E-4FB1-86BB-0C4B2B93ACB6),
@@ -203,7 +188,9 @@ library protocolpatchLib
     HRESULT getForUri([in] IUri * aUri, [out, retval] IFrameRecord ** aRetVal);
     HRESULT watchBrowser([in] IWebBrowser2 * aBrowser, [in] IWebRequestEvents * aEvents);
     HRESULT unwatchBrowser([in] IWebBrowser2 * aBrowser, [in] IWebRequestEvents * aEvents);
-  };
+    HRESULT watchAll([in] IWebRequestEvents * aEvents);
+    HRESULT unwatchAll([in] IWebRequestEvents * aEvents);
+ };
 
   [
 	  object,
@@ -212,7 +199,7 @@ library protocolpatchLib
   ]
   interface IProtPatchApplication : IUnknown
   {
-    HRESULT patchProtokol([in] Scheme aScheme);
+    HRESULT patchProtokol([in] Scheme aScheme, [in] BOOL aUseVTablePatching);
     HRESULT unpatchProtokol([in] Scheme aScheme);
     HRESULT enableProtokol([in] Scheme aScheme, [in] BOOL aEnable);
 
@@ -269,7 +256,9 @@ library protocolpatchLib
 
 
     HRESULT watchBrowser([in] IWebBrowser2* aWebBrowser, [in] IWebRequestEvents * aEvents);
+    HRESULT watchAll([in] IWebRequestEvents * aEvents);
     HRESULT unwatchBrowser([in] IWebBrowser2* aWebBrowser, [in] IWebRequestEvents * aEvents);
+    HRESULT unwatchAll([in] IWebRequestEvents * aEvents);
 
   };
 

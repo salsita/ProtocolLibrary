@@ -25,16 +25,15 @@ inline STDMETHODIMP CComClassFactoryProtocol::CreateInstance(
 		return E_POINTER;
 	}
 	*ppvObj = 0;
-/*
-	CComPtr<IUnknown> spUnkTarget;
+
+  CComPtr<IUnknown> spUnkTarget;
 	HRESULT hr = CreateInstanceTarget(&spUnkTarget);
 	ATLASSERT(SUCCEEDED(hr) && spUnkTarget != 0);
-*/
-	CComPtr<IUnknown> spUnkObject;
-	HRESULT hr = BaseClass::CreateInstance(punkOuter, riid,
+
+  CComPtr<IUnknown> spUnkObject;
+	hr = BaseClass::CreateInstance(punkOuter, riid,
 		reinterpret_cast<void**>(&spUnkObject));
 	ATLASSERT(SUCCEEDED(hr) && spUnkObject != 0);
-/*
 	if (SUCCEEDED(hr))
 	{
 		CComPtr<IPassthroughObject> spPassthroughObj;
@@ -46,7 +45,6 @@ inline STDMETHODIMP CComClassFactoryProtocol::CreateInstance(
 			ATLASSERT(SUCCEEDED(hr));
 		}
 	}
-*/
 	if (SUCCEEDED(hr))
 	{
 		*ppvObj = spUnkObject.Detach();
@@ -54,7 +52,6 @@ inline STDMETHODIMP CComClassFactoryProtocol::CreateInstance(
 	return hr;
 }
 
-/*
 inline HRESULT CComClassFactoryProtocol::CreateInstanceTarget(
 	IUnknown** ppTargetProtocol)
 {
@@ -76,7 +73,6 @@ inline HRESULT CComClassFactoryProtocol::CreateInstanceTarget(
 	}
 	return hr;
 }
-*/
 
 inline HRESULT CComClassFactoryProtocol::GetTargetClassFactory(
 	IClassFactory** ppCF)

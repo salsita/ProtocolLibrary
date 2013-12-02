@@ -1,8 +1,6 @@
 #include "StdAfx.h"
 #include "ThreadRecord.h"
 
-//#define REQUEST_EVENT_SRC_USE_DEFAULT_SINK
-
 namespace protocolpatchLib
 {
 
@@ -59,7 +57,7 @@ STDMETHODIMP ThreadRecord::cleanup()
     mCurrentFrame->cleanup();
     mCurrentFrame.Release();
   }
-  mEvents.Release();
+  mEvents.clear();
   return S_OK;
 }
 
@@ -98,47 +96,89 @@ STDMETHODIMP ThreadRecord::watchBrowser(IWebBrowser2 * aBrowser, IWebRequestEven
     return E_FAIL;
   }
 
-  mEvents = aEvents;
-  return S_OK;
+  return watchAll(aEvents);
 }
 
 STDMETHODIMP ThreadRecord::unwatchBrowser(IWebBrowser2 * aBrowser, IWebRequestEvents * aEvents)
 {
   mTopLevelFrame.Release();
   mCurrentFrame.Release();
-  mEvents.Release();
+  return unwatchAll(aEvents);
+}
+
+STDMETHODIMP ThreadRecord::watchAll(IWebRequestEvents * aEvents)
+{
+  if (!aEvents) {
+    return E_INVALIDARG;
+  }
+  mEvents[(DWORD_PTR)aEvents] = aEvents;
+  return S_OK;
+}
+
+STDMETHODIMP ThreadRecord::unwatchAll(IWebRequestEvents * aEvents)
+{
+  mEvents.erase((DWORD_PTR)aEvents);
   return S_OK;
 }
 
 STDMETHODIMP ThreadRecord::onBeforeRequest(IRequest * aRequest)
 {
-  return (mEvents) ? mEvents->onBeforeRequest(aRequest) : S_OK;
+  HRESULT hrRet = S_OK;
+  for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
+    HRESULT hr = it->second->onBeforeRequest(aRequest);
+    hrRet = (FAILED(hr)) ? hr : hrRet;
+  }
+  return hrRet;
 }
 
 STDMETHODIMP ThreadRecord::onBeforeSendHeaders(IRequest * aRequest)
 {
-  return (mEvents) ? mEvents->onBeforeSendHeaders(aRequest) : S_OK;
+  HRESULT hrRet = S_OK;
+  for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
+    HRESULT hr = it->second->onBeforeSendHeaders(aRequest);
+    hrRet = (FAILED(hr)) ? hr : hrRet;
+  }
+  return hrRet;
 }
 
 STDMETHODIMP ThreadRecord::onBeforeRedirect(IRequest * aRequest)
 {
-  HRESULT hr = (mEvents) ? mEvents->onBeforeRedirect(aRequest) : S_OK;
-  return hr;
+  HRESULT hrRet = S_OK;
+  for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
+    HRESULT hr = it->second->onBeforeRedirect(aRequest);
+    hrRet = (FAILED(hr)) ? hr : hrRet;
+  }
+  return hrRet;
 }
 
 STDMETHODIMP ThreadRecord::onHeadersReceived(IRequest * aRequest)
 {
-  return (mEvents) ? mEvents->onHeadersReceived(aRequest) : S_OK;
+  HRESULT hrRet = S_OK;
+  for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
+    HRESULT hr = it->second->onHeadersReceived(aRequest);
+    hrRet = (FAILED(hr)) ? hr : hrRet;
+  }
+  return hrRet;
 }
 
 STDMETHODIMP ThreadRecord::onInteractive(IRequest * aRequest)
 {
-  return (mEvents) ? mEvents->onInteractive(aRequest) : S_OK;
+  HRESULT hrRet = S_OK;
+  for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
+    HRESULT hr = it->second->onInteractive(aRequest);
+    hrRet = (FAILED(hr)) ? hr : hrRet;
+  }
+  return hrRet;
 }
 
 STDMETHODIMP ThreadRecord::onCompleted(IRequest * aRequest)
 {
-  return (mEvents) ? mEvents->onCompleted(aRequest) : S_OK;
+  HRESULT hrRet = S_OK;
+  for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
+    HRESULT hr = it->second->onCompleted(aRequest);
+    hrRet = (FAILED(hr)) ? hr : hrRet;
+  }
+  return hrRet;
 }
 
 } // namespace protocolpatchLib

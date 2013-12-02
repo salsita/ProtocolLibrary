@@ -7,6 +7,7 @@
 
 #include "resource.h"       // main symbols
 #include "ProtocolLibrary_i.h"
+#include "ClassFactories.h"
 #include <map>
 
 namespace protocolpatchLib
@@ -29,7 +30,7 @@ public:
 
   //--------------------------------------------------------------------------
   // usual stuff
-  Application()
+  Application() : mHandlerType(NONE)
 	{
 	}
 
@@ -55,7 +56,7 @@ public:
 public:
   //--------------------------------------------------------------------------
   // IProtPatchApplication
-  STDMETHOD(patchProtokol)(Scheme aScheme);
+  STDMETHOD(patchProtokol)(Scheme aScheme, BOOL aUseVTablePatching);
   STDMETHOD(unpatchProtokol)(Scheme aScheme);
   STDMETHOD(enableProtokol)(Scheme aScheme, BOOL aEnable);
 
@@ -112,14 +113,27 @@ public:
 
   STDMETHOD(watchBrowser)(IWebBrowser2* aWebBrowser, IWebRequestEvents * aEvents);
   STDMETHOD(unwatchBrowser)(IWebBrowser2* aWebBrowser, IWebRequestEvents * aEvents);
+  STDMETHOD(watchAll)(IWebRequestEvents * aEvents);
+  STDMETHOD(unwatchAll)(IWebRequestEvents * aEvents);
 
-private:  // types
+private:  // methods
   //--------------------------------------------------------------------------
-  typedef std::map<ULONG_PTR, CComPtr<IResourceRequestEvents> > ResourceRequestEventsMap;
-
+  HRESULT patchProtocolInternal(Scheme aScheme);
+  HRESULT unpatchProtocolInternal(Scheme aScheme);
+  HRESULT registerProtocolInternal(Scheme aScheme);
+  HRESULT unregisterProtocolInternal(Scheme aScheme);
 
 private:  // members
-  ResourceRequestEventsMap mResourceRequestEvents;
+  //--------------------------------------------------------------------------
+  enum THandlerType {
+    NONE,
+    PAPP,   // conventional pluggable protocol based on passthru-app
+    PATCH   // vtable patch based protocol handler
+  };
+
+  THandlerType mHandlerType;
+  CComPtr<IClassFactory> mClassFactoryHTTP;
+  CComPtr<IClassFactory> mClassFactoryHTTPS;
 };
 
 OBJECT_ENTRY_AUTO(CLSID_ProtPatchApplication, Application)

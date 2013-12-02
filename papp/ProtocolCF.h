@@ -40,7 +40,7 @@ public:
 	STDMETHODIMP CreateInstance(IUnknown* punkOuter, REFIID riid,
 		void** ppvObj);
 
-//	HRESULT CreateInstanceTarget(IUnknown** ppTargetProtocol);
+	HRESULT CreateInstanceTarget(IUnknown** ppTargetProtocol);
 
 	HRESULT GetTargetClassFactory(IClassFactory** ppCF);
 	HRESULT SetTargetClassFactory(IClassFactory* pCF);
