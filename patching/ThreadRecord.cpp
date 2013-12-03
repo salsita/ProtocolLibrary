@@ -118,7 +118,7 @@ STDMETHODIMP ThreadRecord::watchAll(IWebRequestEvents * aEvents)
 STDMETHODIMP ThreadRecord::unwatchAll(IWebRequestEvents * aEvents)
 {
   mEvents.erase((DWORD_PTR)aEvents);
-  return S_OK;
+  return (0 == mEvents.size()) ? S_OK : S_FALSE;
 }
 
 STDMETHODIMP ThreadRecord::onBeforeRequest(IRequest * aRequest)

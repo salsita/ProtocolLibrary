@@ -7,10 +7,8 @@
 
 #include "resource.h"       // main symbols
 #include <string>
-#include <map>
+#include <set>
 #include <vector>
-#include <unordered_map>
-#include "IDispatchExImpl.h"
 #include "ProtocolLibrary_i.h"
 #include "http_parser.h"
 
@@ -138,6 +136,7 @@ class ATL_NO_VTABLE Headers :
 {
 public:
   typedef CComObject< Headers > _ComObject;
+  typedef IDispatchImpl<IHeaders, &IID_IHeaders, &LIBID_protocolpatchLib, 0xffff, 0xffff>  _DispImpl;
 
   //--------------------------------------------------------------------------
   // static creator
@@ -175,14 +174,36 @@ public:
   // public methods
   HRESULT getHeaders(CStringW & aHeaders);
 
+	STDMETHOD(GetIDsOfNames)(
+		_In_ REFIID riid, 
+		_In_count_(cNames) _Deref_pre_z_ LPOLESTR* rgszNames, 
+		_In_ UINT cNames,
+		_In_ LCID lcid, 
+		_Out_ DISPID* rgdispid);
+
+  STDMETHOD(Invoke)(
+		_In_ DISPID dispidMember, 
+		_In_ REFIID riid,
+		_In_ LCID lcid, 
+		_In_ WORD wFlags, 
+		_In_ DISPPARAMS* pdispparams, 
+		_Out_opt_ VARIANT* pvarResult,
+		_Out_opt_ EXCEPINFO* pexcepinfo, 
+		_Out_opt_ UINT* puArgErr);
+
   STDMETHOD(get_length)(ULONG * aRetVal);
-  //STDMETHOD(item)(ULONG aIndex);
   STDMETHOD(forEach)(IDispatch * aCallback, VARIANT aThis);
+  STDMETHOD(remove)(ULONG aIndex);
+  STDMETHOD(push)(BSTR aKey, BSTR aVal);
+  STDMETHOD(clear)();
+  STDMETHOD(getKV)(ULONG aIndex, BSTR * aRetKey, BSTR * aRetVal);
+  STDMETHOD(get)(ULONG aIndex, IKVPair ** aRetVal);
 
 private:
   //--------------------------------------------------------------------------
   // private types
   typedef std::vector< CComPtr<IKVPair> >  KVPairVector;
+  typedef std::set< IKVPair* > KVPairSet;
 
 private:
   //--------------------------------------------------------------------------
@@ -195,12 +216,8 @@ private:
   //--------------------------------------------------------------------------
   // private members
 
-  // for parsing
-  struct {
-    CStringW  key;
-    CStringW  value;
-  } mKv;
-
+  // temp var for parsing
+  CStringW  mCurrentHeaderKey;
   KVPairVector  mValues;
 };
 

@@ -18,6 +18,9 @@ library protocolpatchLib
 	//importlib("stdole32.tlb");
 	importlib("stdole2.tlb");
 
+  #define DISPID_FIRST_HEADER_NATIVE  100000
+  cpp_quote("enum { DISPID_FIRST_HEADER_NATIVE = 100000 };")
+
   typedef enum Scheme {
     SCHEME_HTTP,
     SCHEME_HTTP_S,
@@ -71,15 +74,40 @@ library protocolpatchLib
   ]
   interface IHeaders : IDispatch
   {
-    [propget, id(1), helpstring(
+    [propget, id(DISPID_FIRST_HEADER_NATIVE + 1), helpstring(
       "Property length."
     )]
     HRESULT length([out, retval] ULONG * aRetVal);
 
-    [id(2), helpstring(
+    [id(DISPID_FIRST_HEADER_NATIVE + 2), helpstring(
       "Method forEach."
     )]
     HRESULT forEach([in] IDispatch * aCallback, [in, optional] VARIANT aThis);
+
+    [id(DISPID_FIRST_HEADER_NATIVE + 3), helpstring(
+      "Method remove."
+    )]
+    HRESULT remove([in] ULONG aIndex);
+
+    [id(DISPID_FIRST_HEADER_NATIVE + 4), helpstring(
+      "Method push."
+    )]
+    HRESULT push([in] BSTR aKey, [in] BSTR aVal);
+
+    [id(DISPID_FIRST_HEADER_NATIVE + 5), helpstring(
+      "Method clear."
+    )]
+    HRESULT clear();
+
+    [id(DISPID_FIRST_HEADER_NATIVE + 6), helpstring(
+      "Method getKV."
+    )]
+    HRESULT getKV([in] ULONG aIndex, [out] BSTR * aRetKey, [out] BSTR * aRetVal);
+
+    [id(DISPID_FIRST_HEADER_NATIVE + 7), helpstring(
+      "Method get."
+    )]
+    HRESULT get([in] ULONG aIndex, [out, retval] IKVPair ** aRetVal);
   };
 
   [
