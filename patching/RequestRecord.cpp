@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "RequestRecord.h"
+#include "ThreadRecord.h"
 
 //#define REQUEST_EVENT_SRC_USE_DEFAULT_SINK
 
@@ -148,6 +149,14 @@ CComPtr<IWebRequestEvents> RequestRecord::getSink(HRESULT & hr)
     CComPtr<IWebRequestEvents> sink;
     hr = mFrameRecord->getSink(&sink.p);
     ATLASSERT(sink);
+    return sink;
+  }
+  CComPtr<IThreadRecord> threadRecord = ThreadRecord::get();
+  if (threadRecord) {
+    CComQIPtr<IWebRequestEvents> sink(threadRecord);
+    if (!sink) {
+      hr = E_NOINTERFACE;
+    }
     return sink;
   }
   return NULL;

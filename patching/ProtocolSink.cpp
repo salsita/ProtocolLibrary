@@ -405,6 +405,9 @@ STDMETHODIMP ProtocolSink::GetBindInfoEx(
   /* [out] */ DWORD* pdwReserved)
 {
   CComQIPtr<IInternetBindInfoEx> pBindInfo(m_spInternetProtocolSink);
+  if (!pBindInfo) {
+    return E_NOINTERFACE;
+  }
   HRESULT hr = pBindInfo->GetBindInfoEx(grfBINDF, pbindinfo, grfBINDF2, pdwReserved);
   if (SUCCEEDED(hr)) {
     m_bindVerb = pbindinfo->dwBindVerb;
