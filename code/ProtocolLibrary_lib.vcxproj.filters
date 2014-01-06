@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="src\stdafx.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="include\targetver.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\handler\ProtocolHandlerRegistrar.h">
+      <Filter>src\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\handler\TemporaryProtocolFolderHandler.h">
+      <Filter>src\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\handler\TemporaryProtocolFolderHandlerClassFactory.h">
+      <Filter>src\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\handler\TemporaryProtocolHandlerClassFactoryT.h">
+      <Filter>src\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\handler\TemporaryProtocolHandlerT.h">
+      <Filter>src\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\handler\TemporaryProtocolResourceHandler.h">
+      <Filter>src\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\handler\TemporaryProtocolResourceHandlerClassFactory.h">
+      <Filter>src\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\http-parser-master\http_parser.h">
+      <Filter>src\http-parser-master</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\papp\PassthroughObject.h">
+      <Filter>src\papp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\papp\ProtocolCF.h">
+      <Filter>src\papp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\papp\ProtocolImpl.h">
+      <Filter>src\papp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\papp\SinkPolicy.h">
+      <Filter>src\papp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\Application.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\ClassFactories.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\FrameRecord.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\GlobalMap.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\Headers.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\IDispatchExImpl.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\IInternetProtocolCFPatch.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\Protocol.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\ProtocolSink.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\Request.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\RequestRecord.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\Response.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\Scheme.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\ThreadRecord.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\patching\VTablePatch.h">
+      <Filter>src\patching</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\lib\stdafx.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\handler\ProtocolHandlerRegistrar.cpp">
+      <Filter>src\handler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\handler\TemporaryProtocolFolderHandler.cpp">
+      <Filter>src\handler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\handler\TemporaryProtocolFolderHandlerClassFactory.cpp">
+      <Filter>src\handler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\handler\TemporaryProtocolResourceHandler.cpp">
+      <Filter>src\handler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\handler\TemporaryProtocolResourceHandlerClassFactory.cpp">
+      <Filter>src\handler</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\http-parser-master\http_parser.c">
+      <Filter>src\http-parser-master</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\patching\Application.cpp">
+      <Filter>src\patching</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\patching\FrameRecord.cpp">
+      <Filter>src\patching</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\patching\Headers.cpp">
+      <Filter>src\patching</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\patching\Protocol.cpp">
+      <Filter>src\patching</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\patching\ProtocolSink.cpp">
+      <Filter>src\patching</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\patching\Request.cpp">
+      <Filter>src\patching</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\patching\RequestRecord.cpp">
+      <Filter>src\patching</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\patching\Response.cpp">
+      <Filter>src\patching</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\patching\ThreadRecord.cpp">
+      <Filter>src\patching</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\Buffer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{D4AE576A-6435-4506-B685-EDFE23687EB5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{856485B5-B140-4A60-BFD4-59F852CB7A05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\handler">
+      <UniqueIdentifier>{21e012eb-eaab-4d53-8ec6-a390b37a9e24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\http-parser-master">
+      <UniqueIdentifier>{9fe4b7e8-6e78-4c93-9c3f-7942ab1709d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\papp">
+      <UniqueIdentifier>{4013c676-035e-4c4e-9565-64ea27046dff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\patching">
+      <UniqueIdentifier>{5842edbf-826d-4263-bc15-3660f7cb7db5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="src\ProtocolLibrary.idl">
+      <Filter>src</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="src\lib\papp\ProtocolCF.inl">
+      <Filter>src\papp</Filter>
+    </None>
+    <None Include="src\lib\papp\ProtocolImpl.inl">
+      <Filter>src\papp</Filter>
+    </None>
+    <None Include="src\lib\papp\SinkPolicy.inl">
+      <Filter>src\papp</Filter>
+    </None>
+  </ItemGroup>
+</Project>
