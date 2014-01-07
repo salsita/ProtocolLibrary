@@ -7,35 +7,6 @@
 #include "stdafx.h"
 #include "ProtocolSink.h"
 
-#ifdef _DEBUG
-# define DUMP_HEADERS(_s) \
-  if (_s) { \
-    CString s = _s, token; \
-    int curPos = 0; \
-    token = s.Tokenize(_T("\r\n"), curPos); \
-    while (!token.IsEmpty()) \
-    { \
-      ATLTRACE(_T("\t")); \
-      ATLTRACE(token); \
-      ATLTRACE(_T("\n")); \
-      token = s.Tokenize(_T("\r\n"), curPos); \
-    } \
-  }
-
-# define DUMP_URI(_s, _uri) \
-  { \
-    ATLASSERT(_uri); \
-    CComBSTR uri; \
-    _uri->GetAbsoluteUri(&uri); \
-    ATLTRACE(_s, uri); \
-  }
-
-#else
-# define DUMP_HEADERS
-# define DUMP_URI
-#endif
-
-
 namespace protocolpatchLib
 {
 
@@ -331,7 +302,6 @@ STDMETHODIMP ProtocolSink::OnResponse(
 
   CComPtr<IHttpNegotiate> spHttpNegotiate;
   QueryServiceFromClient(&spHttpNegotiate);
-DUMP_HEADERS(szResponseHeaders);
   HRESULT hr = (spHttpNegotiate)
       ? spHttpNegotiate->OnResponse(dwResponseCode, szResponseHeaders, szRequestHeaders, pszAdditionalRequestHeaders)
       : S_OK;
