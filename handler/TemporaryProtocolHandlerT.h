@@ -75,15 +75,26 @@ public:
     m_URI.Release();
     IF_FAILED_RET(::CreateUri(szUrl, Uri_CREATE_CANONICALIZE, 0, &m_URI));
 
+    PROTOCOLDATA pd;
+    pd.cbData = sizeof(IInternetProtocolSink*);
+    pd.dwState = 0;
+    pd.pData = pOIProtSink;
+    pOIProtSink->AddRef();
+    pd.grfFlags = PD_FORCE_SWITCH | PI_FORCE_ASYNC;
+    pOIProtSink->Switch(&pd);
+
+    return S_OK;
+  }
+
+
+  STDMETHOD(Continue)(
+    PROTOCOLDATA *pProtocolData)
+  {
+    CComPtr<IInternetProtocolSink> pOIProtSink;
+    pOIProtSink.Attach((IInternetProtocolSink *) pProtocolData->pData);
+    pProtocolData->pData = NULL;
+
     CComBSTR bs;
-
-    // get and check scheme
-    IF_FAILED_RET(m_URI->GetSchemeName(&bs));
-    if (!m_pFactory->CheckScheme(bs))
-    {
-      return INET_E_INVALID_URL;  // not our protocol, don't translate
-    }
-
     // get and check host name
     bs.Empty();
     IF_FAILED_RET(m_URI->GetHost(&bs));
@@ -92,6 +103,13 @@ public:
     if (!m_pFactory->GetResourceInfo(bs, m_HostInfo))
     {
       return INET_E_INVALID_URL;  // not our host, don't translate
+    }
+
+    // get and check scheme
+    IF_FAILED_RET(m_URI->GetSchemeName(&bs));
+    if (!m_pFactory->CheckScheme(bs))
+    {
+      return INET_E_INVALID_URL;  // not our protocol, don't translate
     }
 
     // get path
@@ -134,14 +152,8 @@ public:
     pOIProtSink->ReportData(BSCF_FIRSTDATANOTIFICATION, 0, sz);
     pOIProtSink->ReportData(BSCF_LASTDATANOTIFICATION | BSCF_DATAFULLYAVAILABLE, sz, sz);
 
-    pOIProtSink->ReportResult(S_OK, 0, NULL);
-    return S_OK;
-  }
+    pOIProtSink->ReportResult(S_OK, 200, NULL);
 
-
-  STDMETHOD(Continue)(
-    PROTOCOLDATA *pProtocolData)
-  {
     return S_OK;
   }
 
