@@ -37,7 +37,7 @@ public:
   //virtual ~RequestRecord();
 
   // events
-  HRESULT fire_onBeforeRequest(IUri ** aRedirectUri);
+  HRESULT fire_onBeforeRequest(LPCWSTR aRequestType, IUri ** aRedirectUri);
   HRESULT fire_onBeforeSendHeaders(DWORD aBindVerb, CStringW & aHeaders);
   HRESULT fire_onBeforeRedirect(LPCWSTR aNewUrl);
   HRESULT fire_onHeadersReceived(DWORD aResponseCode, LPCWSTR aHeaders, HRESULT aOnResponseResult);

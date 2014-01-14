@@ -39,10 +39,13 @@ HRESULT RequestRecord::initRequest(IFrameRecord * aFrameRecord, IUri * aUri)
   return S_OK;
 }
 
-HRESULT RequestRecord::fire_onBeforeRequest(IUri ** aRedirectUri)
+HRESULT RequestRecord::fire_onBeforeRequest(LPCWSTR aRequestType, IUri ** aRedirectUri)
 {
   if (!mRequest)
     { return E_UNEXPECTED; }
+
+  static_cast<Request*>(mRequest.p)->setType(aRequestType);
+
   HRESULT hr = S_OK;
   CComPtr<IWebRequestEvents> sink(getSink(hr));
   if (sink && shouldNotify()) {

@@ -71,14 +71,7 @@ HRESULT Headers::parse(LPCWSTR aHeaders, BOOL aIsResponse)
 {
   mValues.clear();
 
-  CStringA headers;
-  if (!aIsResponse) {
-    // In case of a request the parser needs a proper request starting
-    // with an HTTP verb / result. We have only raw headers,
-    // so fake this.
-    headers = ("GET / HTTP/1.1\r\n");
-  }
-  headers += CW2A(aHeaders);
+  CStringA headers = CW2A(aHeaders);
 
   http_parser parser;
   http_parser_init(&parser, (aIsResponse) ? HTTP_RESPONSE : HTTP_REQUEST);

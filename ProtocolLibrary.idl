@@ -15,7 +15,6 @@ import "dispex.idl";
 ]
 library protocolpatchLib
 {
-	//importlib("stdole32.tlb");
 	importlib("stdole2.tlb");
 
   #define DISPID_FIRST_HEADER_NATIVE  100000
@@ -169,6 +168,11 @@ library protocolpatchLib
       "Property response. The response of the current request."
     )]
     HRESULT response([out, retval] IResponse ** aRetVal);
+
+    [propget, id(8), helpstring(
+      "Property requestType. Type of the request as defined in chrome.webRequest."
+    )]
+    HRESULT requestType([out, retval] BSTR * aRetVal);
 
     [id(100), helpstring(
       "isDocumentRequest. Returns S_FALSE if this request is for a resource other than a document."

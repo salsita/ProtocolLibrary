@@ -188,7 +188,7 @@ private:  // types
 
 // ---------------------------------------------------------------------------
 private:  // methods
-  HRESULT beforeRequest();
+  HRESULT beforeRequest(BOOL & aRedirected);
 
 // ---------------------------------------------------------------------------
 private:  // members

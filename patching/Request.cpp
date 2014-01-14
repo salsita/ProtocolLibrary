@@ -48,6 +48,10 @@ HRESULT Request::initRequest(RequestRecord & aRecord)
     mIsTopLevel = (S_OK == frameRecord->isTopLevel());
   }
 
+  // request type might change later as soon as we have some
+  // request headers
+  mType = (mIsTopLevel) ? L"main_frame" : L"sub_frame";
+
   return S_OK;
 }
 
@@ -100,6 +104,16 @@ HRESULT Request::getHeaders(CStringW & aHeaders)
   return static_cast<Headers*>(mHeaders.p)->getHeaders(aHeaders);
 }
 
+HRESULT Request::setType(LPCWSTR aRequestType)
+{
+  // aRequestType can be NULL, in this case we use the type
+  // we have already
+  if (aRequestType) {
+    mType = aRequestType;
+  }
+  return S_OK;
+}
+
 STDMETHODIMP Request::get_requestId(LONG * aRetVal)
 {
   if (!aRetVal) {
@@ -136,9 +150,6 @@ STDMETHODIMP Request::get_verb(BSTR * aRetVal)
   if (!aRetVal) {
     return E_POINTER;
   }
-  if (!mVerb) {
-    return E_UNEXPECTED;
-  }
   (*aRetVal) = mVerb.AllocSysString();
   return S_OK;
 }
@@ -163,6 +174,15 @@ STDMETHODIMP Request::get_response(IResponse ** aRetVal)
     return E_UNEXPECTED;
   }
   return mResponse.CopyTo(aRetVal);
+}
+
+STDMETHODIMP Request::get_requestType(BSTR * aRetVal)
+{
+  if (!aRetVal) {
+    return E_POINTER;
+  }
+  (*aRetVal) = mType.AllocSysString();
+  return S_OK;
 }
 
 STDMETHODIMP Request::isDocumentRequest()

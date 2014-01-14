@@ -52,6 +52,7 @@ public:
   HRESULT redirectRequest(IUri * aNewUri);
   HRESULT initResponse(RequestRecord & aRecord, LPCWSTR aHeaders, DWORD aResponseCode, HRESULT aOnResponseResult);
   HRESULT getHeaders(CStringW & aHeaders);
+  HRESULT setType(LPCWSTR aRequestType);
 
   STDMETHOD(get_requestId)(LONG * aRetVal);
   STDMETHOD(get_currentBrowser)(IWebBrowser2 ** aRetVal);
@@ -59,6 +60,7 @@ public:
   STDMETHOD(get_uri)(BSTR * aRetVal);
   STDMETHOD(get_verb)(BSTR * aRetVal);
   STDMETHOD(get_response)(IResponse ** aRetVal);
+  STDMETHOD(get_requestType)(BSTR * aRetVal);
   STDMETHOD(isDocumentRequest)();
   STDMETHOD(isSubFrame)();
   STDMETHOD(redirect)(BSTR aNewUri);
@@ -73,6 +75,7 @@ private:
   BOOL mIsTopLevel;
   BOOL mCanceled;
   CStringW  mVerb;
+  CStringW  mType;
   CComPtr<IUri> mUri;
   CComPtr<IUri> mRedirectUri;
   CComPtr<IWebBrowser2> mCurrentBrowser;

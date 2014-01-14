@@ -72,17 +72,6 @@ HRESULT ProtocolSink::ContinueStart()
   if (!mStartParams.pTargetProtocol) {
     return E_UNEXPECTED;
   }
-  HRESULT hr = beforeRequest();
-  if (FAILED(hr)) {
-    return hr;
-  }
-
-#ifdef _UNICODE
-  int asd = 0;
-#else
-  int asd = 0
-#endif
-
   // Actually start the request by calling Start() on the native protocol
   return mStartParams.pTargetProtocol->Start(
             mStartParams.sUri,
@@ -100,11 +89,6 @@ HRESULT ProtocolSink::ContinueStartEx()
   if (!targetProtocolEx) {
     return E_NOINTERFACE;
   }
-  HRESULT hr = beforeRequest();
-  if (FAILED(hr)) {
-    return hr;
-  }
-
   // Actually start the request by calling StartEx() on the native protocol
   return targetProtocolEx->StartEx(
             mStartParams.pUri,
@@ -220,11 +204,35 @@ mLogger->info1(CComVariant(s));
 
 //----------------------------------------------------------------------------
 //  beforeRequest
-HRESULT ProtocolSink::beforeRequest()
+HRESULT ProtocolSink::beforeRequest(BOOL & aRedirected)
 {
+  // get the "Accept" header for the request type
+  // (http://developer.chrome.com/extensions/webRequest.html#event-onBeforeRequest)
+  LPCWSTR requestType = NULL;
+  CComQIPtr<IWinInetHttpInfo> httpInfo(mStartParams.pTargetProtocol);
+  if (httpInfo) {
+    CStringA acceptHeader;
+    DWORD size = 0;
+    DWORD flags = 0;
+    httpInfo->QueryInfo(HTTP_QUERY_ACCEPT|HTTP_QUERY_FLAG_REQUEST_HEADERS, NULL, &size, &flags, 0);
+    if (size) {
+      httpInfo->QueryInfo(HTTP_QUERY_ACCEPT|HTTP_QUERY_FLAG_REQUEST_HEADERS, acceptHeader.GetBuffer(size), &size, &flags, 0);
+      acceptHeader.ReleaseBuffer();
+    }
+    if (-1 != acceptHeader.Find("image")) {
+      requestType = L"image";
+    }
+    else if (-1 != acceptHeader.Find("css")) {
+      requestType = L"stylesheet";
+    }
+    else if (-1 != acceptHeader.Find("script")) {
+      requestType = L"script";
+    }
+  }
+
   CComPtr<IUri> redirectUri;
   // fire event
-  HRESULT hr = mRequestRecord.fire_onBeforeRequest(&redirectUri.p);
+  HRESULT hr = mRequestRecord.fire_onBeforeRequest(requestType, &redirectUri.p);
   if (E_ABORT == hr) {
     ReportResult(hr, 0, L"aborted");
     return hr;
@@ -237,6 +245,7 @@ HRESULT ProtocolSink::beforeRequest()
     ReportProgress(64, L"302");
     ReportProgress(BINDSTATUS_REDIRECTING, url);
     ReportResult(INET_E_REDIRECT_FAILED, 0, url);
+    aRedirected = TRUE;
   }
 
   return S_OK;
@@ -253,14 +262,48 @@ STDMETHODIMP ProtocolSink::BeginningTransaction(
   CComPtr<IHttpNegotiate> spHttpNegotiate;
   QueryServiceFromClient(&spHttpNegotiate);
 
-  CString sHdrs = szHeaders;
+  CString sHdrs;
+
+  // get current headers from IWinInetHttpInfo
+  CComQIPtr<IWinInetHttpInfo> httpInfo(mStartParams.pTargetProtocol);
+  if (httpInfo) {
+    CStringA allHeaders;
+    DWORD size = 0;
+    DWORD flags = 0;
+    httpInfo->QueryInfo(HTTP_QUERY_RAW_HEADERS_CRLF|HTTP_QUERY_FLAG_REQUEST_HEADERS, NULL, &size, &flags, 0);
+    if (size) {
+      httpInfo->QueryInfo(HTTP_QUERY_RAW_HEADERS_CRLF|HTTP_QUERY_FLAG_REQUEST_HEADERS, allHeaders.GetBuffer(size), &size, &flags, 0);
+      if (size >= 2) {
+        // strip last CRLF
+        size -= 2;
+      }
+      allHeaders.ReleaseBuffer(size);
+    }
+    sHdrs += CA2W(allHeaders);
+  }
+
+  // add headers passed in here
+  sHdrs += szHeaders;
+
+  // add additional headers
   if (pszAdditionalHeaders) {
     sHdrs += _T("\r\n");
     sHdrs += (*pszAdditionalHeaders);
     sHdrs += _T("\r\n");
   }
 
-  HRESULT hr = mRequestRecord.fire_onBeforeSendHeaders(m_bindVerb, sHdrs);
+  // fire onBeforeRequest first
+  BOOL redirected = FALSE;
+  HRESULT hr = beforeRequest(redirected);
+  if (FAILED(hr)) {
+    return hr;
+  }
+  if (redirected) {
+    return S_OK;
+  }
+
+  // then fire onBeforeSendHeaders
+  hr = mRequestRecord.fire_onBeforeSendHeaders(m_bindVerb, sHdrs);
   if (FAILED(hr)) {
     return hr;
   }
@@ -278,6 +321,11 @@ STDMETHODIMP ProtocolSink::BeginningTransaction(
   if (!wszAdditionalHeaders) {
     return E_OUTOFMEMORY;
   }
+
+ 
+  ATLTRACE(_T("*************** REQUEST ***************\n"));
+  ATLTRACE(sHdrs);
+  ATLTRACE(_T("***************************************\n"));
 
   wcscpy_s(wszAdditionalHeaders, sHdrs.GetLength()+1, sHdrs);
   if (*pszAdditionalHeaders) {
