@@ -7,6 +7,13 @@
 #include "stdafx.h"
 #include "ProtocolSink.h"
 
+#define DUMP_HEADERS(_label, _s) \
+  ATLTRACE(L"*************** %s ***************\n", _label); \
+  ATLTRACE(_s); \
+  ATLTRACE(L"***************************************\n");
+
+#define DUMP_REQUEST_HEADERS(_s)
+
 namespace protocolpatchLib
 {
 
@@ -262,7 +269,7 @@ STDMETHODIMP ProtocolSink::BeginningTransaction(
   CComPtr<IHttpNegotiate> spHttpNegotiate;
   QueryServiceFromClient(&spHttpNegotiate);
 
-  CString sHdrs;
+  CStringW sHdrs;
 
   // get current headers from IWinInetHttpInfo
   CComQIPtr<IWinInetHttpInfo> httpInfo(mStartParams.pTargetProtocol);
@@ -287,9 +294,9 @@ STDMETHODIMP ProtocolSink::BeginningTransaction(
 
   // add additional headers
   if (pszAdditionalHeaders) {
-    sHdrs += _T("\r\n");
+    sHdrs += L"\r\n";
     sHdrs += (*pszAdditionalHeaders);
-    sHdrs += _T("\r\n");
+    sHdrs += L"\r\n";
   }
 
   // fire onBeforeRequest first
@@ -322,10 +329,7 @@ STDMETHODIMP ProtocolSink::BeginningTransaction(
     return E_OUTOFMEMORY;
   }
 
- 
-  ATLTRACE(_T("*************** REQUEST ***************\n"));
-  ATLTRACE(sHdrs);
-  ATLTRACE(_T("***************************************\n"));
+  DUMP_REQUEST_HEADERS(sHdrs)
 
   wcscpy_s(wszAdditionalHeaders, sHdrs.GetLength()+1, sHdrs);
   if (*pszAdditionalHeaders) {
