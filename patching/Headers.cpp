@@ -108,11 +108,11 @@ HRESULT Headers::getHeaders(CStringW & aHeaders)
 //--------------------------------------------------------------------------
 // GetIDsOfNames
 STDMETHODIMP Headers::GetIDsOfNames(
-	_In_ REFIID riid, 
-	_In_count_(cNames) _Deref_pre_z_ LPOLESTR* rgszNames, 
-	_In_ UINT cNames,
-	_In_ LCID lcid, 
-	_Out_ DISPID* rgdispid)
+  _In_ REFIID riid, 
+  _In_count_(cNames) _Deref_pre_z_ LPOLESTR* rgszNames, 
+  _In_ UINT cNames,
+  _In_ LCID lcid, 
+  _Out_ DISPID* rgdispid)
 {
   if (!rgdispid) {
     return E_POINTER;
@@ -142,14 +142,14 @@ STDMETHODIMP Headers::GetIDsOfNames(
 //--------------------------------------------------------------------------
 // Invoke
 STDMETHODIMP Headers::Invoke(
-	_In_ DISPID dispidMember, 
-	_In_ REFIID riid,
-	_In_ LCID lcid, 
-	_In_ WORD wFlags, 
-	_In_ DISPPARAMS* pdispparams, 
-	_Out_opt_ VARIANT* pvarResult,
-	_Out_opt_ EXCEPINFO* pexcepinfo, 
-	_Out_opt_ UINT* puArgErr)
+  _In_ DISPID dispidMember, 
+  _In_ REFIID riid,
+  _In_ LCID lcid, 
+  _In_ WORD wFlags, 
+  _In_ DISPPARAMS* pdispparams, 
+  _Out_opt_ VARIANT* pvarResult,
+  _Out_opt_ EXCEPINFO* pexcepinfo, 
+  _Out_opt_ UINT* puArgErr)
 {
   HRESULT hr = _DispImpl::Invoke(dispidMember, riid, lcid, wFlags, pdispparams, pvarResult, pexcepinfo, puArgErr);
   if (SUCCEEDED(hr)) {

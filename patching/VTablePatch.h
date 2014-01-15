@@ -172,7 +172,7 @@ protected:
 //  - a struct _PatchMapEntry containining a _patchFn / _restoreFn pair
 //  - a static method _getPatchMap that returns the patchmap
 #define BEGIN_PATCH_MAP(cls) \
-	typedef cls _PatchMapClass; \
+  typedef cls _PatchMapClass; \
   typedef HRESULT (_PatchMapClass::*_patchFn)(VTABLE); \
   typedef HRESULT (_PatchMapClass::*_restoreFn)(); \
   struct _PatchMapEntry { \

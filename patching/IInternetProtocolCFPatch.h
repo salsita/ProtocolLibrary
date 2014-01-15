@@ -121,9 +121,9 @@ public:
       return hr;
     }
 
-		CComQIPtr<IPassthroughObject> spPassthroughObj(ourProtocol);
+    CComQIPtr<IPassthroughObject> spPassthroughObj(ourProtocol);
     ATLASSERT(spPassthroughObj);
-		hr = spPassthroughObj->SetTargetUnknown(nativeProtocol);
+    hr = spPassthroughObj->SetTargetUnknown(nativeProtocol);
     ATLASSERT(SUCCEEDED(hr));
 
     return ourProtocol->QueryInterface(riid, ppvObject);

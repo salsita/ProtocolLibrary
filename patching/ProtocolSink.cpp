@@ -34,17 +34,6 @@ PROTOCOLDATA * ProtocolSink::sProtocolDataReportResult = &ProtocolSink::sProtoco
 ProtocolSink::ProtocolSink() :
     m_bindVerb(-1)
 {
-#ifdef SINK_LOGGER
-  CComPtr<ILogServerApplication> logServer;
-  logServer.CoCreateInstance(CLSID_LogServerApplication);
-  if (logServer) {
-    CComVariant vtEmpty;
-    CComPtr<IDispatch> disp;
-    logServer->createLogger(CComBSTR(L"ProtocolSink"), CComVariant(L"ProtocolSink"), &disp.p);
-    mLogger = disp;
-  }
-  ATLENSURE(mLogger);
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -109,11 +98,6 @@ HRESULT ProtocolSink::ContinueStartEx()
 //  ContinueReportResult
 HRESULT ProtocolSink::ContinueReportResult()
 {
-#ifdef SINK_LOGGER
-CString s;
-s.Format(_T("ContinueReportResult on sink 0x%08x for URL %s"), this, mRequestRecord.mUrlString);
-mLogger->info1(CComVariant(s));
-#endif
   ATLASSERT(m_spInternetProtocolSink != 0);
   HRESULT hr = (m_spInternetProtocolSink)
       ? m_spInternetProtocolSink->ReportResult(mReportResultParams.hrResult, mReportResultParams.dwError, mReportResultParams.szResult)
@@ -160,13 +144,6 @@ HRESULT ProtocolSink::OnStart(
 
   mStartParams.pUri.Release();
   ::CreateUri(szUrl, Uri_CREATE_CANONICALIZE, 0, &mStartParams.pUri);
-
-#ifdef SINK_LOGGER
-CString s;
-s.Format(_T("OnStart on sink 0x%08x for URL %s"), this, szUrl);
-mLogger->info1(CComVariant(s));
-#endif
-
   return S_OK;
 }
 
@@ -199,12 +176,6 @@ HRESULT ProtocolSink::OnStartEx(
   CComBSTR bs;
   hr = pUri->GetAbsoluteUri(&bs);
   mStartParams.sUri = bs;
-
-#ifdef SINK_LOGGER
-CString s;
-s.Format(_T("OnStartEx on sink 0x%08x for URL %s"), this, bs);
-mLogger->info1(CComVariant(s));
-#endif
 
   return hr;
 }

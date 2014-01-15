@@ -19,9 +19,9 @@ namespace protocolpatchLib
  *  HTTPS protocols, manages browser instances.
  */
 class ATL_NO_VTABLE Application :
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<Application, &CLSID_ProtPatchApplication>,
-	public IProtPatchApplication
+  public CComObjectRootEx<CComSingleThreadModel>,
+  public CComCoClass<Application, &CLSID_ProtPatchApplication>,
+  public IProtPatchApplication
 {
 public:
   //--------------------------------------------------------------------------
@@ -31,27 +31,27 @@ public:
   //--------------------------------------------------------------------------
   // usual stuff
   Application() : mHandlerType(NONE)
-	{
-	}
+  {
+  }
 
   DECLARE_CLASSFACTORY_SINGLETON(Application)
   DECLARE_NO_REGISTRY()
   DECLARE_NOT_AGGREGATABLE(Application)
 
   BEGIN_COM_MAP(Application)
-	  COM_INTERFACE_ENTRY(IProtPatchApplication)
+    COM_INTERFACE_ENTRY(IProtPatchApplication)
   END_COM_MAP()
 
-	DECLARE_PROTECT_FINAL_CONSTRUCT()
+  DECLARE_PROTECT_FINAL_CONSTRUCT()
 
-	HRESULT FinalConstruct()
-	{
-		return S_OK;
-	}
+  HRESULT FinalConstruct()
+  {
+    return S_OK;
+  }
 
-	void FinalRelease()
-	{
-	}
+  void FinalRelease()
+  {
+  }
 
 public:
   //--------------------------------------------------------------------------

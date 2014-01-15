@@ -1,5 +1,8 @@
-// dllmain.h : Declaration of module class.
-
+/****************************************************************************
+ * dllmain.h : Declaration of module class.
+ * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
 
 // We don't want this DLL to be registerable. Clients have to use
 // registry-free loading. So our UpdateRegistryAppId() method

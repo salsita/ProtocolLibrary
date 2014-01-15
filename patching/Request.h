@@ -16,9 +16,9 @@ class RequestRecord;
 // Request
 
 class ATL_NO_VTABLE Request :
-	public CComObjectRootEx<CComObjectThreadModel>,
-	public CComCoClass<Request, &CLSID_Request>,
-	public IDispatchImpl<IRequest, &IID_IRequest, &LIBID_protocolpatchLib, 0xffff, 0xffff>
+  public CComObjectRootEx<CComObjectThreadModel>,
+  public CComCoClass<Request, &CLSID_Request>,
+  public IDispatchImpl<IRequest, &IID_IRequest, &LIBID_protocolpatchLib, 0xffff, 0xffff>
 {
 public:
   typedef CComObject< Request > _ComObject;
@@ -28,22 +28,22 @@ public:
   static HRESULT createInstance(CComPtr<IRequest> & aRetVal);
 
   Request() : mRequestId(0), mIsDocument(FALSE), mIsTopLevel(FALSE), mCanceled(FALSE)
-	  {}
+    {}
 
   //DECLARE_REGISTRY_RESOURCEID(IDR_REQUEST)
   DECLARE_NO_REGISTRY()
   DECLARE_NOT_AGGREGATABLE(Request)
-	DECLARE_PROTECT_FINAL_CONSTRUCT()
+  DECLARE_PROTECT_FINAL_CONSTRUCT()
 
   BEGIN_COM_MAP(Request)
-	  COM_INTERFACE_ENTRY(IRequest)
-	  COM_INTERFACE_ENTRY(IDispatch)
+    COM_INTERFACE_ENTRY(IRequest)
+    COM_INTERFACE_ENTRY(IDispatch)
   END_COM_MAP()
 
-	HRESULT FinalConstruct()
+  HRESULT FinalConstruct()
     { return S_OK; }
 
-	void FinalRelease()
+  void FinalRelease()
     { }
 
 

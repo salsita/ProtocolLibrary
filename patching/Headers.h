@@ -20,8 +20,8 @@ namespace protocolpatchLib
  *  Dictionary object, containing HTTP headers
  */
 class ATL_NO_VTABLE KVPair :
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public IDispatchImpl<IKVPair, &IID_IKVPair, &LIBID_protocolpatchLib, 0xffff, 0xffff>
+  public CComObjectRootEx<CComSingleThreadModel>,
+  public IDispatchImpl<IKVPair, &IID_IKVPair, &LIBID_protocolpatchLib, 0xffff, 0xffff>
 {
 public:
   typedef CComObject< KVPair > _ComObject;
@@ -43,26 +43,26 @@ public:
 
   //--------------------------------------------------------------------------
   // usual stuff
-	KVPair()
-	{
-	}
+  KVPair()
+  {
+  }
 
   DECLARE_NO_REGISTRY()
-	DECLARE_PROTECT_FINAL_CONSTRUCT()
+  DECLARE_PROTECT_FINAL_CONSTRUCT()
 
   BEGIN_COM_MAP(KVPair)
-	  COM_INTERFACE_ENTRY(IKVPair)
-	  COM_INTERFACE_ENTRY(IDispatch)
+    COM_INTERFACE_ENTRY(IKVPair)
+    COM_INTERFACE_ENTRY(IDispatch)
   END_COM_MAP()
 
   HRESULT FinalConstruct()
-	{
-		return S_OK;
-	}
+  {
+    return S_OK;
+  }
 
-	void FinalRelease()
-	{
-	}
+  void FinalRelease()
+  {
+  }
 
 public:
   //--------------------------------------------------------------------------
@@ -131,8 +131,8 @@ private:
  *  Dictionary object, containing HTTP headers
  */
 class ATL_NO_VTABLE Headers :
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public IDispatchImpl<IHeaders, &IID_IHeaders, &LIBID_protocolpatchLib, 0xffff, 0xffff>
+  public CComObjectRootEx<CComSingleThreadModel>,
+  public IDispatchImpl<IHeaders, &IID_IHeaders, &LIBID_protocolpatchLib, 0xffff, 0xffff>
 {
 public:
   typedef CComObject< Headers > _ComObject;
@@ -147,49 +147,49 @@ public:
 
   //--------------------------------------------------------------------------
   // usual stuff
-	Headers()
-	{
-	}
+  Headers()
+  {
+  }
 
   DECLARE_NO_REGISTRY()
   DECLARE_NOT_AGGREGATABLE(Headers)
-	DECLARE_PROTECT_FINAL_CONSTRUCT()
+  DECLARE_PROTECT_FINAL_CONSTRUCT()
 
   BEGIN_COM_MAP(Headers)
-	  COM_INTERFACE_ENTRY(IHeaders)
-	  COM_INTERFACE_ENTRY(IDispatch)
+    COM_INTERFACE_ENTRY(IHeaders)
+    COM_INTERFACE_ENTRY(IDispatch)
   END_COM_MAP()
 
   HRESULT FinalConstruct()
-	{
-		return S_OK;
-	}
+  {
+    return S_OK;
+  }
 
-	void FinalRelease()
-	{
-	}
+  void FinalRelease()
+  {
+  }
 
 public:
   //--------------------------------------------------------------------------
   // public methods
   HRESULT getHeaders(CStringW & aHeaders);
 
-	STDMETHOD(GetIDsOfNames)(
-		_In_ REFIID riid, 
-		_In_count_(cNames) _Deref_pre_z_ LPOLESTR* rgszNames, 
-		_In_ UINT cNames,
-		_In_ LCID lcid, 
-		_Out_ DISPID* rgdispid);
+  STDMETHOD(GetIDsOfNames)(
+    _In_ REFIID riid, 
+    _In_count_(cNames) _Deref_pre_z_ LPOLESTR* rgszNames, 
+    _In_ UINT cNames,
+    _In_ LCID lcid, 
+    _Out_ DISPID* rgdispid);
 
   STDMETHOD(Invoke)(
-		_In_ DISPID dispidMember, 
-		_In_ REFIID riid,
-		_In_ LCID lcid, 
-		_In_ WORD wFlags, 
-		_In_ DISPPARAMS* pdispparams, 
-		_Out_opt_ VARIANT* pvarResult,
-		_Out_opt_ EXCEPINFO* pexcepinfo, 
-		_Out_opt_ UINT* puArgErr);
+    _In_ DISPID dispidMember, 
+    _In_ REFIID riid,
+    _In_ LCID lcid, 
+    _In_ WORD wFlags, 
+    _In_ DISPPARAMS* pdispparams, 
+    _Out_opt_ VARIANT* pvarResult,
+    _Out_opt_ EXCEPINFO* pexcepinfo, 
+    _Out_opt_ UINT* puArgErr);
 
   STDMETHOD(get_length)(ULONG * aRetVal);
   STDMETHOD(forEach)(IDispatch * aCallback, VARIANT aThis);

@@ -20,7 +20,7 @@ HRESULT ProtocolStartPolicy::OnStart(
 {
   // Initialize the sink. This has to happen first to be able to Switch().
   Protocol * protocol = static_cast<Protocol*>(this);
-	ProtocolSink* sink = GetSink(protocol);
+  ProtocolSink* sink = GetSink(protocol);
   HRESULT hr = sink->OnStart(szUrl, pOIProtSink, pOIBindInfo, grfPI, dwReserved, pTargetProtocol);
   if (FAILED(hr)) {
     return hr;
@@ -39,7 +39,7 @@ HRESULT ProtocolStartPolicy::OnStartEx(
 {
   // Initialize the sink. This has to happen first to be able to Switch().
   Protocol * protocol = static_cast<Protocol*>(this);
-	ProtocolSink* sink = GetSink(protocol);
+  ProtocolSink* sink = GetSink(protocol);
   HRESULT hr = sink->OnStartEx(pUri, pOIProtSink, pOIBindInfo, grfPI, dwReserved, pTargetProtocol);
   if (FAILED(hr)) {
     return hr;

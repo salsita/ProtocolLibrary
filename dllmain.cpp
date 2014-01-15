@@ -1,4 +1,8 @@
-// dllmain.cpp : Implementation of DllMain.
+/****************************************************************************
+ * dllmain.cpp : Implementation of DllMain.
+ * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
 
 #include "stdafx.h"
 #include "resource.h"

@@ -35,8 +35,7 @@ HRESULT RequestRecord::initRequest(IFrameRecord * aFrameRecord, IUri * aUri)
     mFrameRecord = aFrameRecord;
   }
   Request* request = static_cast<Request*>(mRequest.p);
-  hr = request->initRequest(*this);
-  return S_OK;
+  return request->initRequest(*this);
 }
 
 HRESULT RequestRecord::fire_onBeforeRequest(LPCWSTR aRequestType, IUri ** aRedirectUri)

@@ -27,7 +27,7 @@ typedef GlobalMapAccessor< ThreadRecordMap >
  *  URL the browser is initially navigating to.
  */
 class ATL_NO_VTABLE ThreadRecord :
-	public CComObjectRootEx<CComObjectThreadModel>,
+  public CComObjectRootEx<CComObjectThreadModel>,
   public IWebRequestEvents,
   public IThreadRecord
 {
@@ -44,11 +44,11 @@ public:
   {
   }
 
-	DECLARE_PROTECT_FINAL_CONSTRUCT()
+  DECLARE_PROTECT_FINAL_CONSTRUCT()
 
   BEGIN_COM_MAP(ThreadRecord)
-	  COM_INTERFACE_ENTRY(IThreadRecord)
-	  COM_INTERFACE_ENTRY(IWebRequestEvents)
+    COM_INTERFACE_ENTRY(IThreadRecord)
+    COM_INTERFACE_ENTRY(IWebRequestEvents)
   END_COM_MAP()
 
   HRESULT FinalConstruct()
@@ -57,9 +57,8 @@ public:
   }
 
   void FinalRelease()
-	{
-    int asd = 0;
-	}
+  {
+  }
 
 public:
   // -------------------------------------------------------------------------

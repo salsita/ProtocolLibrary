@@ -26,7 +26,7 @@ template <class TImpl, const GUID* plibid = &CAtlModule::m_libid, WORD wMajor = 
           WORD wMinor = 0, class tihclass = CComTypeInfoHolder>
   class IDispatchExImpl :
       public MembersLockable,
-	    public IDispatchImpl<IDispatchEx, &IID_IDispatchEx, plibid,
+      public IDispatchImpl<IDispatchEx, &IID_IDispatchEx, plibid,
                       wMajor, wMinor>
 {
 public:
@@ -57,24 +57,24 @@ public:
     IServiceProvider  * pspCaller)
   {
     LOCKED_BLOCK();
-	  if (wFlags & DISPATCH_METHOD && !(wFlags & DISPATCH_PROPERTYGET)) {
+    if (wFlags & DISPATCH_METHOD && !(wFlags & DISPATCH_PROPERTYGET)) {
       return static_cast<TImpl*>(this)->callMethod(id, pdp, pvarRes);
-	  }
+    }
 
     MapDispId2StringOrdered::iterator it = mNames.find(id);
     if (it == mNames.end()) {
-		  return DISP_E_MEMBERNOTFOUND;
+      return DISP_E_MEMBERNOTFOUND;
     }
 
     // set value
     if (wFlags & DISPATCH_PROPERTYPUT)
-	  {
+    {
       // need the property to be set
       if (!pdp || (pdp->cArgs < 1)) {
-			  return DISP_E_BADPARAMCOUNT;
+        return DISP_E_BADPARAMCOUNT;
       }
       return static_cast<TImpl*>(this)->putValue(id, pdp->rgvarg + pdp->cArgs - 1);
-	  }
+    }
     if (!pvarRes) {
       return E_POINTER;
     }
@@ -107,7 +107,7 @@ public:
     DWORD   grfdexFetch,
     DWORD * pgrfdex)
   {
-	  return E_NOTIMPL;
+    return E_NOTIMPL;
   }
 
   //----------------------------------------------------------------------------
@@ -167,7 +167,7 @@ public:
   STDMETHOD(GetNameSpaceParent)(
     IUnknown  **  ppunk)
   {
-	  return E_NOTIMPL;
+    return E_NOTIMPL;
   }
 
 protected:
@@ -179,7 +179,7 @@ protected:
     VARIANT     * aRetVal)
   {
     // by default have no methods, only values
-		return DISP_E_MEMBERNOTFOUND;
+    return DISP_E_MEMBERNOTFOUND;
   }
 
   HRESULT putValue(
@@ -190,7 +190,7 @@ protected:
       mValues[aId].Copy(aProperty);
       mModified = TRUE;
     }
-		return S_OK;
+    return S_OK;
   }
 
   HRESULT getValue(
@@ -202,7 +202,7 @@ protected:
     }
     MapDispId2Variant::iterator it = mValues.find(aId);
     if (it == mValues.end()) {
-	    return DISP_E_MEMBERNOTFOUND;
+      return DISP_E_MEMBERNOTFOUND;
     }
     return ::VariantCopy(aRetVal, &it->second);
   }
@@ -216,7 +216,7 @@ protected:
     }
     MapDispId2StringOrdered::iterator it = mNames.find(aId);
     if (it == mNames.end()) {
-	    return DISP_E_MEMBERNOTFOUND;
+      return DISP_E_MEMBERNOTFOUND;
     }
     (*aRetVal) = ::SysAllocString(it->second.c_str());
     return S_OK;
@@ -230,24 +230,24 @@ protected:
     if (!aRetVal) {
       return E_POINTER;
     }
-	  (*aRetVal) = DISPID_UNKNOWN;
+    (*aRetVal) = DISPID_UNKNOWN;
 
     MapName2DispId::iterator it = mNameIDs.find(aName);
     if (it != mNameIDs.end()) {
       MapDispId2Variant::iterator it2 = mValues.find(it->second);
       if (it2 == mValues.end() && !aCreate) {
-	      return DISP_E_UNKNOWNNAME;
+        return DISP_E_UNKNOWNNAME;
       }
       (*aRetVal) = it->second;
       return S_OK;
     }
     if (!aCreate) {
-	    return DISP_E_UNKNOWNNAME;
+      return DISP_E_UNKNOWNNAME;
     }
 
     mNameIDs[aName] = mNextDispID;
     mNames[mNextDispID] = aName;
-	  (*aRetVal) = mNextDispID;
+    (*aRetVal) = mNextDispID;
     ++mNextDispID;
 
     return S_OK;
@@ -257,7 +257,7 @@ protected:
   {
     MapDispId2Variant::iterator it = mValues.find(aId);
     if (it == mValues.end()) {
-	    return DISP_E_UNKNOWNNAME;
+      return DISP_E_UNKNOWNNAME;
     }
     // Note: We keep the entry in mNames and of course in
     // mNameIDs. IDispatchEx requires, that the name/DISPID
@@ -270,7 +270,7 @@ protected:
   {
     MapName2DispId::iterator it = mNameIDs.find(aName);
     if (it == mNameIDs.end()) {
-	    return DISP_E_UNKNOWNNAME;
+      return DISP_E_UNKNOWNNAME;
     }
     return static_cast<TImpl*>(this)->remove(it->second);
   }
