@@ -148,7 +148,6 @@ public:
   ComObjectClass; \
   typedef CComCreator<ComObjectClass> _CreatorClass;
 
-
 template <class Protocol, class Sink>
 class CustomSinkStartPolicy
 {

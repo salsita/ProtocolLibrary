@@ -1,6 +1,6 @@
 /****************************************************************************
  * Application.cpp : Implementation of Application
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 
@@ -159,7 +159,6 @@ STDMETHODIMP Application::AddResource(
   return CProtocolHandlerRegistrar::
       AddResource(lpszURL, lpData, dwLength, lpszMimeType);
 }
-
 
 //--------------------------------------------------------------------------
 // watchBrowser
@@ -337,6 +336,5 @@ HRESULT Application::unregisterProtocolInternal(Scheme aScheme)
   }
   return E_INVALIDARG;
 }
-
 
 } // namespace protocolpatchLib

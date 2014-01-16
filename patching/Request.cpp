@@ -1,6 +1,6 @@
 /****************************************************************************
  * Request.h : Declaration of Request
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 
@@ -239,4 +239,3 @@ STDMETHODIMP Request::isCanceled()
 }
 
 } // namespace protocolpatchLib
-

@@ -1,6 +1,6 @@
 /****************************************************************************
  * Response.h : Declaration of Response
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 #pragma once
@@ -30,7 +30,6 @@ public:
   Request() : mRequestId(0), mIsDocument(FALSE), mIsTopLevel(FALSE), mCanceled(FALSE)
     {}
 
-  //DECLARE_REGISTRY_RESOURCEID(IDR_REQUEST)
   DECLARE_NO_REGISTRY()
   DECLARE_NOT_AGGREGATABLE(Request)
   DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -45,7 +44,6 @@ public:
 
   void FinalRelease()
     { }
-
 
   HRESULT initRequest(RequestRecord & aRecord);
   HRESULT beforeSendingRequest(RequestRecord & aRecord, DWORD aBindVerb, LPCWSTR aHeaders);
@@ -84,6 +82,5 @@ private:
 };
 
 OBJECT_ENTRY_NON_CREATEABLE_EX_AUTO(CLSID_Request, Request)
-
 
 } // namespace protocolpatchLib

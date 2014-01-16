@@ -1,3 +1,10 @@
+/****************************************************************************
+ * TemporaryProtocolFolderHandler.cpp : Implementation of
+ * CTemporaryProtocolFolderHandler
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
+
 #include "StdAfx.h"
 #include "TemporaryProtocolFolderHandler.h"
 #include "TemporaryProtocolFolderHandlerClassFactory.h"
@@ -108,4 +115,3 @@ STDMETHODIMP CTemporaryProtocolFolderHandler::Seek(
   }
   return S_OK;
 }
-

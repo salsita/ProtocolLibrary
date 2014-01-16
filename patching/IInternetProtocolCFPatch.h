@@ -1,6 +1,6 @@
 /****************************************************************************
  * IInternetProtocolCFPatch.h : Declaration of IInternetProtocolCFPatch.
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 #pragma once
@@ -24,7 +24,7 @@ typedef PassthroughAPP::CMetaFactory<CComClassFactoryPatch,
 template<class TSchemeTraits> class IInternetProtocolCFPatch :
     public IUnknownPatch
 {
-public:
+public: // types
   typedef IInternetProtocolCFPatch<TSchemeTraits> _PatchClass;
 
   //--------------------------------------------------------------------------

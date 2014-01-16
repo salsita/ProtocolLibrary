@@ -1,6 +1,6 @@
 /****************************************************************************
- * ClassFactories.h : 
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * ClassFactories.h :
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 #pragma once
@@ -64,7 +64,7 @@ public:
     }
     return hr;
   }
-  
+
   HRESULT SetTargetCLSID(REFCLSID clsid, DWORD clsContext = CLSCTX_ALL)
   {
     CComPtr<IClassFactory> spTargetCF;
@@ -96,7 +96,5 @@ public:
 private:
   CComPtr<IClassFactory> m_spTargetCF;
 };
-
-
 
 } // namespace protocolpatchLib

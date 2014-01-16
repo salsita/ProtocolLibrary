@@ -1,18 +1,11 @@
 /****************************************************************************
  * ProtocolSink.cpp : Implementation of ProtocolSink
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 
 #include "stdafx.h"
 #include "ProtocolSink.h"
-
-#define DUMP_HEADERS(_label, _s) \
-  ATLTRACE(L"*************** %s ***************\n", _label); \
-  ATLTRACE(_s); \
-  ATLTRACE(L"***************************************\n");
-
-#define DUMP_REQUEST_HEADERS(_s)
 
 namespace protocolpatchLib
 {
@@ -300,8 +293,6 @@ STDMETHODIMP ProtocolSink::BeginningTransaction(
     return E_OUTOFMEMORY;
   }
 
-  DUMP_REQUEST_HEADERS(sHdrs)
-
   wcscpy_s(wszAdditionalHeaders, sHdrs.GetLength()+1, sHdrs);
   if (*pszAdditionalHeaders) {
     ::CoTaskMemFree(*pszAdditionalHeaders);
@@ -338,7 +329,6 @@ STDMETHODIMP ProtocolSink::ReportProgress(
   /* [in] */ ULONG ulStatusCode,
   /* [in] */ LPCWSTR szStatusText)
 {
-ATLTRACE(_T("--> ReportProgress: %i\n"), ulStatusCode);
   if (ulStatusCode == BINDSTATUS_REDIRECTING) {
     HRESULT hr = mRequestRecord.fire_onBeforeRedirect(szStatusText);
     if (E_ABORT == hr) {
@@ -407,7 +397,6 @@ STDMETHODIMP ProtocolSink::GetBindInfoEx(
   }
   return hr;
 }
-
 
 /*============================================================================
  * class ProtocolSink::DocumentSink

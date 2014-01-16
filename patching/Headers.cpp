@@ -1,6 +1,6 @@
 /****************************************************************************
  * Headers.cpp : Implementation of Headers
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 
@@ -11,6 +11,10 @@
 
 namespace protocolpatchLib
 {
+
+/*============================================================================
+ * class Headers
+ */
 
 //--------------------------------------------------------------------------
 // onHeaderField
@@ -108,10 +112,10 @@ HRESULT Headers::getHeaders(CStringW & aHeaders)
 //--------------------------------------------------------------------------
 // GetIDsOfNames
 STDMETHODIMP Headers::GetIDsOfNames(
-  _In_ REFIID riid, 
-  _In_count_(cNames) _Deref_pre_z_ LPOLESTR* rgszNames, 
+  _In_ REFIID riid,
+  _In_count_(cNames) _Deref_pre_z_ LPOLESTR* rgszNames,
   _In_ UINT cNames,
-  _In_ LCID lcid, 
+  _In_ LCID lcid,
   _Out_ DISPID* rgdispid)
 {
   if (!rgdispid) {
@@ -122,11 +126,13 @@ STDMETHODIMP Headers::GetIDsOfNames(
   if (SUCCEEDED(hr)) {
     return hr;
   }
+  // if _DispImpl does not know the name it is supposed to be an array entry
   HRESULT hrRet = hr;
 
   CComVariant vtIndex(rgszNames[0]);
   hr = vtIndex.ChangeType(VT_I4);
   if (FAILED(hr)) {
+    // not a number
     return hrRet;
   }
 
@@ -142,20 +148,22 @@ STDMETHODIMP Headers::GetIDsOfNames(
 //--------------------------------------------------------------------------
 // Invoke
 STDMETHODIMP Headers::Invoke(
-  _In_ DISPID dispidMember, 
+  _In_ DISPID dispidMember,
   _In_ REFIID riid,
-  _In_ LCID lcid, 
-  _In_ WORD wFlags, 
-  _In_ DISPPARAMS* pdispparams, 
+  _In_ LCID lcid,
+  _In_ WORD wFlags,
+  _In_ DISPPARAMS* pdispparams,
   _Out_opt_ VARIANT* pvarResult,
-  _Out_opt_ EXCEPINFO* pexcepinfo, 
+  _Out_opt_ EXCEPINFO* pexcepinfo,
   _Out_opt_ UINT* puArgErr)
 {
   HRESULT hr = _DispImpl::Invoke(dispidMember, riid, lcid, wFlags, pdispparams, pvarResult, pexcepinfo, puArgErr);
   if (SUCCEEDED(hr)) {
     return hr;
   }
+  // if _DispImpl does not know the DISPID it is supposed to be an array entry
   if (!(DISPATCH_PROPERTYGET & wFlags)) {
+    // The array is read-only for scripting. Might change in future.
     return hr;
   }
 
@@ -191,12 +199,16 @@ STDMETHODIMP Headers::forEach(IDispatch * aCallback, VARIANT aThis)
   if (!aCallback) {
     return E_INVALIDARG;
   }
+  // use a snapshot, so callback can change the original array without
+  // affecting the forEach loop
   KVPairVector tmp = mValues;
+  // record removed values to remove them after the loop from the original
+  // data storage
   KVPairSet removed;
 
   // forEach callback args:  this,  array, index,    value
   // in reversed order
-  CComVariant args[]      = {aThis, this,  (ULONG)0, NULL};
+  CComVariant args[] = {aThis, this,  (ULONG)0, NULL};
   DISPID namedArgs[] = {DISPID_THIS};
   DISPPARAMS params = {&args[1], NULL, _countof(args)-1, 0};
 

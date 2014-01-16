@@ -1,6 +1,6 @@
 /****************************************************************************
  * Scheme.h : Scheme enum and traits.
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 #pragma once
@@ -9,7 +9,6 @@
 
 namespace protocolpatchLib
 {
-
 
 //--------------------------------------------------------------------------
 // Scheme traits: Scheme enum and CLSID.

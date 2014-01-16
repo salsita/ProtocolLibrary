@@ -1,6 +1,6 @@
 /****************************************************************************
  * Protocol.h : Declaration of Protocol
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 #pragma once
@@ -54,8 +54,6 @@ public: // methods
       HANDLE_PTR              dwReserved,
       IInternetProtocolEx   * pTargetProtocol);
 };
-
-
 
 /*============================================================================
  * class Protocol
@@ -117,6 +115,5 @@ private:  // methods
 private:  // members
   CComPtr<IFrameRecord> mFrameRecord;
 };
-
 
 } // namespace protocolpatchLib

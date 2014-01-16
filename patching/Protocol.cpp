@@ -1,6 +1,6 @@
 /****************************************************************************
  * Protocol.cpp : Implementation of Protocol
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 
@@ -48,7 +48,6 @@ HRESULT ProtocolStartPolicy::OnStartEx(
   // And Switch() for StartEx() to the main thread.
   return sink->SwitchStartEx();
 }
-
 
 /*============================================================================
  * class Protocol
@@ -110,9 +109,6 @@ HRESULT Protocol::initRequest(IUri *pUri,
 
   mFrameRecord.Release();
 
-CComBSTR uri;
-pUri->GetAbsoluteUri(&uri);
-
   // The logic here is as follows:
   // - if we have no ThreadRecord for this thread this is for sure
   //   a resource request
@@ -142,6 +138,5 @@ pUri->GetAbsoluteUri(&uri);
 
   return GetSink()->mRequestRecord.initRequest(mFrameRecord, pUri);
 }
-
 
 } // namespace protocolpatchLib

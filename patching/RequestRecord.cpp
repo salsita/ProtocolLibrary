@@ -196,5 +196,4 @@ BOOL RequestRecord::shouldNotify()
   return TRUE;
 }
 
-
 } // namespace protocolpatchLib

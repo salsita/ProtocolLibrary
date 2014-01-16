@@ -1,11 +1,9 @@
 // ProtocolLibrary.cpp : Implementation of DLL Exports.
 
-
 #include "stdafx.h"
 #include "resource.h"
 #include "ProtocolLibrary_i.h"
 #include "dllmain.h"
-
 
 // Used to determine whether the DLL can be unloaded by OLE.
 STDAPI DllCanUnloadNow(void)
@@ -18,7 +16,6 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 {
   return _AtlModule.DllGetClassObject(rclsid, riid, ppv);
 }
-
 
 // These COM server functions were left here for completeness
 // of the server only. For the non-registered version these
@@ -51,7 +48,7 @@ STDAPI DllInstall(BOOL bInstall, LPCWSTR pszCmdLine)
     }
   }
 
-  if (bInstall) { 
+  if (bInstall) {
     hr = DllRegisterServer();
     if (FAILED(hr)) {
       DllUnregisterServer();

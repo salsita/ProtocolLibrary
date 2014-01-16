@@ -1,3 +1,9 @@
+/****************************************************************************
+ * TemporaryProtocolHandlerT.h : Declaration of CTemporaryProtocolHandlerT
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
+
 #pragma once
 
 #include <atlfile.h>
@@ -87,7 +93,6 @@ public:
 
     return S_OK;
   }
-
 
   STDMETHOD(Continue)(
     PROTOCOLDATA *pProtocolData)

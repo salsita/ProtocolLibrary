@@ -1,6 +1,6 @@
 /****************************************************************************
  * FrameRecord.cpp : Implementation of FrameRecord
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 
@@ -97,7 +97,7 @@ STDMETHODIMP FrameRecord::cleanup()
 
 //--------------------------------------------------------------------------
 // beforeNavigate
-//  Called from within OnBeforeNavigate2() to update our internal data 
+//  Called from within OnBeforeNavigate2() to update our internal data
 STDMETHODIMP FrameRecord::beforeNavigate(LPCWSTR aUrl, IWebBrowser2 * aBrowser)
 {
   if (aBrowser) {

@@ -1,6 +1,6 @@
 /****************************************************************************
  * Response.h : Declaration of Response
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 #pragma once
@@ -56,6 +56,5 @@ private:
 };
 
 OBJECT_ENTRY_NON_CREATEABLE_EX_AUTO(CLSID_Response, Response)
-
 
 } // namespace protocolpatchLib

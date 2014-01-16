@@ -56,7 +56,6 @@ PassthroughItfData
     QueryInterfacePassthroughT\
   },
 
-
 #ifdef DEBUG
 
   #define COM_INTERFACE_ENTRY_PASSTHROUGH_DEBUG()\
