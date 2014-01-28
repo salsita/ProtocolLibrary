@@ -106,10 +106,7 @@ set(${PROJECT_NAME}_HEADERS_PROT_PATCHING
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/FrameRecord.h"
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/GlobalMap.h"
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/Headers.h"
-<<<<<<< Updated upstream
-=======
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/IDispatchExImpl.h"
->>>>>>> Stashed changes
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/IInternetProtocolCFPatch.h"
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/Protocol.h"
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/ProtocolSink.h"
