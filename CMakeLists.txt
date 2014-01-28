@@ -4,7 +4,7 @@
 cmake_minimum_required (VERSION 2.8)
 project (ProtocolLibrary)
 
-set(CMAKE_CONFIGURATION_TYPES Debug Release )
+set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo )
 set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Reset the configurations to those we need" FORCE)
 
 ### Variables describing project layout
@@ -106,6 +106,10 @@ set(${PROJECT_NAME}_HEADERS_PROT_PATCHING
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/FrameRecord.h"
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/GlobalMap.h"
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/Headers.h"
+<<<<<<< Updated upstream
+=======
+  "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/IDispatchExImpl.h"
+>>>>>>> Stashed changes
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/IInternetProtocolCFPatch.h"
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/Protocol.h"
   "${${PROJECT_NAME}_SRC_DIR_PROT_PATCHING}/ProtocolSink.h"
@@ -235,7 +239,7 @@ endif (${CMAKE_CL_64})
 
 set(${PROJECT_NAME}_MIDL_ARGUMENTS
                      "${${PROJECT_NAME}_IDL_FILE}"
-                     /D $<$<CONFIG:Debug>:"_DEBUG"> $<$<CONFIG:Release>:"NDEBUG">
+                     /D $<$<CONFIG:Debug>:"_DEBUG"> $<$<CONFIG:Release>:"NDEBUG"> $<$<CONFIG:RelWithDebInfo>:"NDEBUG">
                      /D "MODULES_HAVE_EXPORT_PROPERTY"
                      /nologo
                      /char signed
