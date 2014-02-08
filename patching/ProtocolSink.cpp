@@ -25,8 +25,16 @@ PROTOCOLDATA * ProtocolSink::sProtocolDataReportResult = &ProtocolSink::sProtoco
 //----------------------------------------------------------------------------
 //  CTOR
 ProtocolSink::ProtocolSink() :
-    m_bindVerb(-1)
+    m_bindVerb(-1), mIsDocumentThread(FALSE)
 {
+}
+
+//----------------------------------------------------------------------------
+//  initRequest
+HRESULT ProtocolSink::initRequest(IFrameRecord * aFrameRecord, IUri * aUri, BOOL aIsDocumentThread)
+{
+  mIsDocumentThread = aIsDocumentThread;
+  return mRequestRecord.initRequest(aFrameRecord, aUri);
 }
 
 //----------------------------------------------------------------------------
@@ -50,7 +58,13 @@ HRESULT ProtocolSink::SwitchStartEx()
 HRESULT ProtocolSink::SwitchReportResult()
 {
   (IInternetProtocolSink*)(this)->AddRef();
-  return Switch(sProtocolDataReportResult);
+  // Sometimes Continue() is not called when Switch()ing on the document
+  // thread.
+  // To avoid this we switch only when we are not already on the
+  // document thread.
+  // More mysteriously this seems to happen only for ReportResult() - probably
+  // because this is the last call before the request is finished.
+  return (mIsDocumentThread) ? ContinueReportResult() : Switch(sProtocolDataReportResult);
 }
 
 //----------------------------------------------------------------------------
