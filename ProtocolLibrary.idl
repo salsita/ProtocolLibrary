@@ -377,6 +377,7 @@ library protocolpatchLib
     HRESULT cleanup();
     HRESULT getToplevel([out, retval] IFrameRecord ** aRetVal);
     HRESULT getCurrent([out, retval] IFrameRecord ** aRetVal);
+    ULONG getThreadId();
     HRESULT getForUri([in] IUri * aUri, [out, retval] IFrameRecord ** aRetVal);
     HRESULT watchBrowser([in] IWebBrowser2 * aBrowser, [in] IWebRequestEvents * aEvents);
     HRESULT unwatchBrowser([in] IWebBrowser2 * aBrowser, [in] IWebRequestEvents * aEvents);

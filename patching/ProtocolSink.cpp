@@ -25,15 +25,15 @@ PROTOCOLDATA * ProtocolSink::sProtocolDataReportResult = &ProtocolSink::sProtoco
 //----------------------------------------------------------------------------
 //  CTOR
 ProtocolSink::ProtocolSink() :
-    m_bindVerb(-1), mIsDocumentThread(FALSE)
+    m_bindVerb(-1), mDocumentThreadId(0)
 {
 }
 
 //----------------------------------------------------------------------------
 //  initRequest
-HRESULT ProtocolSink::initRequest(IFrameRecord * aFrameRecord, IUri * aUri, BOOL aIsDocumentThread)
+HRESULT ProtocolSink::initRequest(IFrameRecord * aFrameRecord, IUri * aUri, DWORD aDocumentThreadId)
 {
-  mIsDocumentThread = aIsDocumentThread;
+  mDocumentThreadId = aDocumentThreadId;
   return mRequestRecord.initRequest(aFrameRecord, aUri);
 }
 
@@ -41,7 +41,11 @@ HRESULT ProtocolSink::initRequest(IFrameRecord * aFrameRecord, IUri * aUri, BOOL
 //  SwitchStart
 HRESULT ProtocolSink::SwitchStart()
 {
-  (IInternetProtocolSink*)(this)->AddRef();
+  if (mDocumentThreadId == ::GetCurrentThreadId()) {
+    return ContinueStart();
+  }
+  // this will get released in Protocol::Continue(...)
+  ((IInternetProtocolSink*)this)->AddRef();
   return Switch(sProtocolDataStart);
 }
 
@@ -49,7 +53,11 @@ HRESULT ProtocolSink::SwitchStart()
 //  SwitchStartEx
 HRESULT ProtocolSink::SwitchStartEx()
 {
-  (IInternetProtocolSink*)(this)->AddRef();
+  if (mDocumentThreadId == ::GetCurrentThreadId()) {
+    return ContinueStartEx();
+  }
+  // this will get released in Protocol::Continue(...)
+  ((IInternetProtocolSink*)this)->AddRef();
   return Switch(sProtocolDataStartEx);
 }
 
@@ -57,14 +65,18 @@ HRESULT ProtocolSink::SwitchStartEx()
 //  SwitchReportResult
 HRESULT ProtocolSink::SwitchReportResult()
 {
-  (IInternetProtocolSink*)(this)->AddRef();
   // Sometimes Continue() is not called when Switch()ing on the document
   // thread.
   // To avoid this we switch only when we are not already on the
   // document thread.
   // More mysteriously this seems to happen only for ReportResult() - probably
   // because this is the last call before the request is finished.
-  return (mIsDocumentThread) ? ContinueReportResult() : Switch(sProtocolDataReportResult);
+  if (mDocumentThreadId == ::GetCurrentThreadId()) {
+    return ContinueReportResult();
+  }
+  // this will get released in Protocol::Continue(...)
+  ((IInternetProtocolSink*)this)->AddRef();
+  return Switch(sProtocolDataReportResult);
 }
 
 //----------------------------------------------------------------------------

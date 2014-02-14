@@ -116,7 +116,7 @@ public: // methods
 
   // -------------------------------------------------------------------------
 
-  HRESULT initRequest(IFrameRecord * aFrameRecord, IUri * aUri, BOOL aIsDocumentThread);
+  HRESULT initRequest(IFrameRecord * aFrameRecord, IUri * aUri, DWORD aDocumentThreadId);
 
   // Returns the current bind verb.
   DWORD GetBindVerb() { return m_bindVerb; }
@@ -199,7 +199,7 @@ private:  // members
   static PROTOCOLDATA * sProtocolDataStartEx;
   static PROTOCOLDATA * sProtocolDataReportResult;
   DWORD m_bindVerb;
-  BOOL mIsDocumentThread;
+  DWORD mDocumentThreadId;
 
 //CComQIPtr<ILogger2> mLogger;
 

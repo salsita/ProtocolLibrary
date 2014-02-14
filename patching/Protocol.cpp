@@ -136,7 +136,7 @@ HRESULT Protocol::initRequest(IUri *pUri,
     }
   }
 
-  return GetSink()->initRequest(mFrameRecord, pUri, (threadRecord != NULL));
+  return GetSink()->initRequest(mFrameRecord, pUri, (threadRecord) ? threadRecord->getThreadId() : 0);
 }
 
 } // namespace protocolpatchLib

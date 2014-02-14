@@ -40,8 +40,9 @@ public:
   static CComPtr<IThreadRecord> create();
   static HRESULT remove();
 
-  ThreadRecord()
+  ThreadRecord() : mThreadId(0)
   {
+    mThreadId = ::GetCurrentThreadId();
   }
 
   DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -66,6 +67,7 @@ public:
   STDMETHOD(cleanup)();
   STDMETHOD(getToplevel)(IFrameRecord ** aRetVal);
   STDMETHOD(getCurrent)(IFrameRecord ** aRetVal);
+  STDMETHOD_(ULONG, getThreadId)();
   STDMETHOD(getForUri)(IUri * aUri, IFrameRecord ** aRetVal);
   STDMETHOD(watchBrowser)(IWebBrowser2 * aBrowser, IWebRequestEvents * aEvents);
   STDMETHOD(unwatchBrowser)(IWebBrowser2 * aBrowser, IWebRequestEvents * aEvents);
@@ -88,6 +90,7 @@ private:
   static CComPtr<IThreadRecord> createInstance();
   HRESULT init(IWebBrowser2 * aBrowser);
 
+  DWORD                       mThreadId;
   CComPtr<IFrameRecord>       mTopLevelFrame;
   CComPtr<IFrameRecord>       mCurrentFrame;
   WebRequestEventsMap         mEvents;

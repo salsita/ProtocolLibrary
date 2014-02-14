@@ -30,7 +30,7 @@ CComPtr<IThreadRecord> ThreadRecord::create()
     return record;
   }
   record = createInstance();
-  map[::GetCurrentThreadId()] = record;
+  map[record->getThreadId()] = record;
   return record;
 }
 
@@ -69,6 +69,11 @@ STDMETHODIMP ThreadRecord::getToplevel(IFrameRecord ** aRetVal)
 STDMETHODIMP ThreadRecord::getCurrent(IFrameRecord ** aRetVal)
 {
   return mCurrentFrame.CopyTo(aRetVal);
+}
+
+STDMETHODIMP_(ULONG) ThreadRecord::getThreadId()
+{
+  return mThreadId;
 }
 
 STDMETHODIMP ThreadRecord::getForUri(IUri * aUri, IFrameRecord ** aRetVal)
