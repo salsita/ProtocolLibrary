@@ -202,7 +202,7 @@ STDMETHODIMP Request::isSubFrame()
 STDMETHODIMP Request::redirect(BSTR aNewUri)
 {
   mRedirectUri.Release();
-  return ::CreateUri(aNewUri, Uri_CREATE_CANONICALIZE, 0, &mRedirectUri);
+  return ::CreateUri(aNewUri, Uri_CREATE_CANONICALIZE | Uri_CREATE_NO_DECODE_EXTRA_INFO, 0, &mRedirectUri);
 }
 
 STDMETHODIMP Request::cancel()

@@ -48,7 +48,7 @@ HRESULT FrameRecord::createUriNoFragment(IUri * aUri, IUri ** aRetVal)
     return hr;
   }
   uriBuilder->SetFragment(NULL);
-  return uriBuilder->CreateUri(Uri_CREATE_CANONICALIZE, 0, 0, aRetVal);
+  return uriBuilder->CreateUri(Uri_CREATE_CANONICALIZE | Uri_CREATE_NO_DECODE_EXTRA_INFO, 0, 0, aRetVal);
 }
 
 //--------------------------------------------------------------------------
@@ -111,7 +111,7 @@ STDMETHODIMP FrameRecord::beforeNavigate(LPCWSTR aUrl, IWebBrowser2 * aBrowser)
 STDMETHODIMP FrameRecord::setUri(LPCWSTR aNewUri)
 {
   CComPtr<IUri> uri;
-  HRESULT hr = ::CreateUri(aNewUri, Uri_CREATE_CANONICALIZE, 0, &uri);
+  HRESULT hr = ::CreateUri(aNewUri, Uri_CREATE_CANONICALIZE | Uri_CREATE_NO_DECODE_EXTRA_INFO, 0, &uri);
   if (FAILED(hr)) {
     // NOTE: A failure might happen here. File URLs from
     // OnBrowserBeforeNavigate2 for example are passed

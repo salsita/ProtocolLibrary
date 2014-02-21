@@ -85,7 +85,7 @@ HRESULT RequestRecord::fire_onBeforeSendHeaders(DWORD aBindVerb, CStringW & aHea
 HRESULT RequestRecord::fire_onBeforeRedirect(LPCWSTR aNewUrl)
 {
   CComPtr<IUri> uri;
-  HRESULT hr = ::CreateUri(aNewUrl, Uri_CREATE_CANONICALIZE, 0, &uri);
+  HRESULT hr = ::CreateUri(aNewUrl, Uri_CREATE_CANONICALIZE | Uri_CREATE_NO_DECODE_EXTRA_INFO, 0, &uri);
   setCurrentUri(uri);
   if (mRequest) {
     static_cast<Request*>(mRequest.p)
@@ -174,7 +174,7 @@ HRESULT RequestRecord::getUri(IUri ** aUriRet)
   if (FAILED(hr)) {
     return hr;
   }
-  return uriBuilder->CreateUri(Uri_CREATE_CANONICALIZE, 0, 0, aUriRet);
+  return uriBuilder->CreateUri(Uri_CREATE_CANONICALIZE | Uri_CREATE_NO_DECODE_EXTRA_INFO, 0, 0, aUriRet);
 }
 
 HRESULT RequestRecord::setCurrentUri(IUri * aUri)

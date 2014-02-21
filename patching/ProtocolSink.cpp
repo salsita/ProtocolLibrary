@@ -162,7 +162,7 @@ HRESULT ProtocolSink::OnStart(
   mStartParams.sUri = szUrl;
 
   mStartParams.pUri.Release();
-  ::CreateUri(szUrl, Uri_CREATE_CANONICALIZE, 0, &mStartParams.pUri);
+  ::CreateUri(szUrl, Uri_CREATE_CANONICALIZE | Uri_CREATE_NO_DECODE_EXTRA_INFO, 0, &mStartParams.pUri);
   return S_OK;
 }
 
