@@ -24,7 +24,6 @@
 #include <Exdisp.h>
 #include <Exdispid.h>
 #include <SHLGUID.h>
-#include <Ctxtcall.h>
 
 using namespace ATL;
 

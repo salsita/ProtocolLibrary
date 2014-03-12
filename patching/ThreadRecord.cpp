@@ -4,71 +4,6 @@
 namespace protocolpatchLib
 {
 
-/*============================================================================
- * struct ComCallDataWebRequestEvents
- * This struct derives from ComCallData and contains additional members for
- * passing information to a IContextCallback::ContextCallback call.
- * This includes the current CAnchoRuntime instance as a IWebRequestEvents
- * and the current IRequest.
- * It also contains an enum for specifying the IWebRequestEvents method to.
- */
-struct ComCallDataWebRequestEvents : public ComCallData
-{
-  enum {
-    OnBeforeRequest = 1,
-    OnBeforeSendHeaders,
-    OnBeforeRedirect,
-    OnHeadersReceived,
-    OnInteractive,
-    OnCompleted
-  };
-  ComCallDataWebRequestEvents(DWORD aDispId, IWebRequestEvents * aEvents, IRequest * aRequest) :
-    mEvents(aEvents), mRequest(aRequest)
-  {
-    dwDispid = aDispId;
-    dwReserved = 0;
-    pUserDefined = NULL;
-  }
-  CComPtr<IWebRequestEvents> mEvents;
-  CComPtr<IRequest> mRequest;
-};
-
-//----------------------------------------------------------------------------
-// contextCall
-// The function passed to IContextCallback::ContextCallback for IWebRequestEvents
-// calls that don't happen on the document thread.
-// It extracts information about the call from pParam and calls the method again,
-// this time on the correct thread.
-HRESULT _stdcall contextCall(ComCallData *pParam)
-{
-  ComCallDataWebRequestEvents * callback = (ComCallDataWebRequestEvents*) pParam;
-  switch(callback->dwDispid) {
-    case ComCallDataWebRequestEvents::OnBeforeRequest:
-      return callback->mEvents->onBeforeRequest(callback->mRequest);
-    case ComCallDataWebRequestEvents::OnBeforeSendHeaders:
-      return callback->mEvents->onBeforeSendHeaders(callback->mRequest);
-    case ComCallDataWebRequestEvents::OnBeforeRedirect:
-      return callback->mEvents->onBeforeRedirect(callback->mRequest);
-    case ComCallDataWebRequestEvents::OnHeadersReceived:
-      return callback->mEvents->onHeadersReceived(callback->mRequest);
-    case ComCallDataWebRequestEvents::OnInteractive:
-      return callback->mEvents->onInteractive(callback->mRequest);
-    case ComCallDataWebRequestEvents::OnCompleted:
-      return callback->mEvents->onCompleted(callback->mRequest);
-  }
-  return S_OK;
-}
-
-// macro for marshalling a call back to the document thread. Used
-// by the IWebRequestEvents implementaton of CAnchoRuntime.
-// If the call does NOT happen on the document thread it invokes
-// contextCall which in turn will call back on the document thread.
-#define MARSHALL_CALL(callId) \
-  if (mDocThreadId != ::GetCurrentThreadId()) { \
-    ComCallDataWebRequestEvents cd(ComCallDataWebRequestEvents::callId, this, aRequest); \
-    return mContextCallback->ContextCallback(&contextCall, &cd, IID_NULL, 0, NULL); \
-  }
-
 CComPtr<IThreadRecord> ThreadRecord::createInstance()
 {
   _ComObject * newInstance = NULL;
@@ -193,68 +128,74 @@ STDMETHODIMP ThreadRecord::unwatchAll(IWebRequestEvents * aEvents)
 
 STDMETHODIMP ThreadRecord::onBeforeRequest(IRequest * aRequest)
 {
-  MARSHALL_CALL(OnBeforeRequest);
-  HRESULT hrRet = S_OK;
-  for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
-    HRESULT hr = it->second->onBeforeRequest(aRequest);
-    hrRet = (FAILED(hr)) ? hr : hrRet;
-  }
-  return hrRet;
+  return CallApartment([&] () -> HRESULT {
+    HRESULT hrRet = S_OK;
+    for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
+      HRESULT hr = it->second->onBeforeRequest(aRequest);
+      hrRet = (FAILED(hr)) ? hr : hrRet;
+    }
+    return hrRet;
+  });
 }
 
 STDMETHODIMP ThreadRecord::onBeforeSendHeaders(IRequest * aRequest)
 {
-  MARSHALL_CALL(OnBeforeSendHeaders);
-  HRESULT hrRet = S_OK;
-  for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
-    HRESULT hr = it->second->onBeforeSendHeaders(aRequest);
-    hrRet = (FAILED(hr)) ? hr : hrRet;
-  }
-  return hrRet;
+  return CallApartment([&] () -> HRESULT {
+    HRESULT hrRet = S_OK;
+    for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
+      HRESULT hr = it->second->onBeforeSendHeaders(aRequest);
+      hrRet = (FAILED(hr)) ? hr : hrRet;
+    }
+    return hrRet;
+  });
 }
 
 STDMETHODIMP ThreadRecord::onBeforeRedirect(IRequest * aRequest)
 {
-  MARSHALL_CALL(OnBeforeRedirect);
-  HRESULT hrRet = S_OK;
-  for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
-    HRESULT hr = it->second->onBeforeRedirect(aRequest);
-    hrRet = (FAILED(hr)) ? hr : hrRet;
-  }
-  return hrRet;
+  return CallApartment([&] () -> HRESULT {
+    HRESULT hrRet = S_OK;
+    for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
+      HRESULT hr = it->second->onBeforeRedirect(aRequest);
+      hrRet = (FAILED(hr)) ? hr : hrRet;
+    }
+    return hrRet;
+  });
 }
 
 STDMETHODIMP ThreadRecord::onHeadersReceived(IRequest * aRequest)
 {
-  MARSHALL_CALL(OnHeadersReceived);
-  HRESULT hrRet = S_OK;
-  for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
-    HRESULT hr = it->second->onHeadersReceived(aRequest);
-    hrRet = (FAILED(hr)) ? hr : hrRet;
-  }
-  return hrRet;
+  return CallApartment([&] () -> HRESULT {
+    HRESULT hrRet = S_OK;
+    for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
+      HRESULT hr = it->second->onHeadersReceived(aRequest);
+      hrRet = (FAILED(hr)) ? hr : hrRet;
+    }
+    return hrRet;
+  });
 }
 
 STDMETHODIMP ThreadRecord::onInteractive(IRequest * aRequest)
 {
-  MARSHALL_CALL(OnInteractive);
-  HRESULT hrRet = S_OK;
-  for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
-    HRESULT hr = it->second->onInteractive(aRequest);
-    hrRet = (FAILED(hr)) ? hr : hrRet;
-  }
-  return hrRet;
+  return CallApartment([&] () -> HRESULT {
+    HRESULT hrRet = S_OK;
+    for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
+      HRESULT hr = it->second->onInteractive(aRequest);
+      hrRet = (FAILED(hr)) ? hr : hrRet;
+    }
+    return hrRet;
+  });
 }
 
 STDMETHODIMP ThreadRecord::onCompleted(IRequest * aRequest)
 {
-  MARSHALL_CALL(OnCompleted);
-  HRESULT hrRet = S_OK;
-  for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
-    HRESULT hr = it->second->onCompleted(aRequest);
-    hrRet = (FAILED(hr)) ? hr : hrRet;
-  }
-  return hrRet;
+  return CallApartment([&] () -> HRESULT {
+    HRESULT hrRet = S_OK;
+    for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
+      HRESULT hr = it->second->onCompleted(aRequest);
+      hrRet = (FAILED(hr)) ? hr : hrRet;
+    }
+    return hrRet;
+  });
 }
 
 } // namespace protocolpatchLib

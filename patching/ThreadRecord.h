@@ -9,6 +9,7 @@
 #include "GlobalMap.h"
 #include "FrameRecord.h"
 #include <map>
+#include <libbhohelper.h>
 
 namespace protocolpatchLib
 {
@@ -27,6 +28,7 @@ typedef GlobalMapAccessor< ThreadRecordMap >
  *  URL the browser is initially navigating to.
  */
 class ATL_NO_VTABLE ThreadRecord :
+  public LIB_BhoHelper::ApartmentContext,
   public CComObjectRootEx<CComObjectThreadModel>,
   public IWebRequestEvents,
   public IThreadRecord
@@ -54,7 +56,6 @@ public:
 
   HRESULT FinalConstruct()
   {
-    IF_FAILED_RET(::CoGetObjectContext(IID_IContextCallback, (void**)&mContextCallback.p));
     return S_OK;
   }
 
@@ -91,12 +92,7 @@ private:
   static CComPtr<IThreadRecord> createInstance();
   HRESULT init(IWebBrowser2 * aBrowser);
 
-  // remember the current document thread to be able to check whether we
-  // should execute a IWebRequestEvents immediately or marshall it back
-  // to the document thread.
   DWORD mDocThreadId;
-  // our context marshaller for IWebRequestEvents calls
-  CComPtr<IContextCallback>   mContextCallback;
   CComPtr<IFrameRecord>       mTopLevelFrame;
   CComPtr<IFrameRecord>       mCurrentFrame;
   WebRequestEventsMap         mEvents;
