@@ -23,8 +23,8 @@ namespace protocolpatchLib
 //  static creator method
 CComPtr<IFrameRecord> FrameRecord::createInstance(
     IWebRequestEvents * aEventSink,
-      IWebBrowser2 * aBrowser,
-      BOOL aIsTopLevel)
+    IWebBrowser2 * aBrowser,
+    BOOL aIsTopLevel)
 {
   _ComObject * newInstance = NULL;
   if (SUCCEEDED(_ComObject::CreateInstance(&newInstance))) {

@@ -124,7 +124,7 @@ HRESULT ProtocolSink::ContinueReportResult()
   if (FAILED(hr)) {
     return hr;
   }
-  CComPtr<IFrameRecord> frameRecord = mRequestRecord.getFrameRecord();
+  CComPtr<IFrameRecord> frameRecord = mRequestRecord.frameRecord;
   if (frameRecord) {
     CComPtr<IWebBrowser2> browser;
     frameRecord->getBrowser(&browser.p);
@@ -436,15 +436,9 @@ HRESULT ProtocolSink::DocumentSink::prepareDocumentNotification(RequestRecord & 
   CComBSTR readyState;
   aHTMLDoc->get_readyState(&readyState);
 
-  if (readyState == L"interactive") {
-    // interactive state: notify, but still sink "complete" state
-    aRecord.fire_onInteractive();
-  }
-  else if (readyState == L"complete") {
-    // complete state already reached, process immediately
-    aRecord.fire_onInteractive();
-    aRecord.fire_onCompleted();
-    // and return.
+  aRecord.fire_onDocumentReadyState(readyState);
+  if (RequestRecord::DOCUMENTCOMPLETE == aRecord.state) {
+    // complete state already reached
     return S_OK;
   }
 
@@ -497,11 +491,8 @@ STDMETHODIMP_(void) ProtocolSink::DocumentSink::OnReadyStateChange(IHTMLEventObj
   CComBSTR readyState;
   mHTMLDocument->get_readyState(&readyState);
 
-  if (readyState == L"interactive") {
-    mRecord.fire_onInteractive();
-  }
-  else if (readyState == L"complete") {
-    mRecord.fire_onCompleted();
+  mRecord.fire_onDocumentReadyState(readyState);
+  if (RequestRecord::DOCUMENTCOMPLETE == mRecord.state) {
     // tmp for DispEventUnadvise
     CComPtr<IHTMLDocument2> tmp(mHTMLDocument);
     mHTMLDocument.Release();

@@ -29,7 +29,7 @@ HRESULT Response::createInstance(CComPtr<IResponse> & aRetVal)
 
 HRESULT Response::initResponse(RequestRecord & aRecord, LPCWSTR aHeaders, DWORD aResponseCode, HRESULT aOnResponseResult)
 {
-  mRequestId = aRecord.getId();
+  mRequestId = aRecord.id;
   mResponseCode = aResponseCode;
   mHeaders.Release();
   HRESULT hr = S_OK;

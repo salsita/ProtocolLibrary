@@ -54,7 +54,7 @@ HRESULT RequestRecord::fire_onBeforeRequest(LPCWSTR aRequestType, IUri ** aRedir
 
     // canceled?
     if (S_OK == mRequest->isCanceled())
-      { return E_ABORT; }
+      { return S_OK; }
 
     // a redirect?
     mRequest->getRedirectUri(aRedirectUri);
@@ -143,6 +143,21 @@ HRESULT RequestRecord::fire_onCompleted()
     { hr = sink->onCompleted(mRequest); }
   mState = DOCUMENTCOMPLETE;
   return hr;
+}
+
+HRESULT RequestRecord::fire_onDocumentReadyState(LPCWSTR aReadyState)
+{
+  CStringW state(aReadyState);
+  if (state == L"interactive" && mState < DOCUMENTINTERACTIVE) {
+    return fire_onInteractive();
+  }
+  else if (state == L"complete" && mState < DOCUMENTCOMPLETE) {
+    if (mState < DOCUMENTINTERACTIVE) {
+      fire_onInteractive();
+    }
+    return fire_onCompleted();
+  }
+  return S_FALSE; // non-critical
 }
 
 CComPtr<IWebRequestEvents> RequestRecord::getSink(HRESULT & hr)

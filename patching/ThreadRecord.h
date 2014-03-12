@@ -40,9 +40,9 @@ public:
   static CComPtr<IThreadRecord> create();
   static HRESULT remove();
 
-  ThreadRecord() : mThreadId(0)
+  ThreadRecord() : mDocThreadId(0)
   {
-    mThreadId = ::GetCurrentThreadId();
+    mDocThreadId = ::GetCurrentThreadId();
   }
 
   DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -54,6 +54,7 @@ public:
 
   HRESULT FinalConstruct()
   {
+    IF_FAILED_RET(::CoGetObjectContext(IID_IContextCallback, (void**)&mContextCallback.p));
     return S_OK;
   }
 
@@ -90,7 +91,12 @@ private:
   static CComPtr<IThreadRecord> createInstance();
   HRESULT init(IWebBrowser2 * aBrowser);
 
-  DWORD                       mThreadId;
+  // remember the current document thread to be able to check whether we
+  // should execute a IWebRequestEvents immediately or marshall it back
+  // to the document thread.
+  DWORD mDocThreadId;
+  // our context marshaller for IWebRequestEvents calls
+  CComPtr<IContextCallback>   mContextCallback;
   CComPtr<IFrameRecord>       mTopLevelFrame;
   CComPtr<IFrameRecord>       mCurrentFrame;
   WebRequestEventsMap         mEvents;

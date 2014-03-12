@@ -44,27 +44,18 @@ public:
   HRESULT fire_onInteractive();
   HRESULT fire_onCompleted();
 
+  HRESULT fire_onDocumentReadyState(LPCWSTR aReadyState);
+
   //HRESULT reset();
 
   //HRESULT prepareRequest(IWebBrowser2* aTopLevelBrowser, IWebBrowser2* aCurrentBrowser, IUri * aUri, IWebRequestEvents * aBrowserEvents);
   HRESULT initRequest(IFrameRecord * aFrameRecord, IUri * aUri);
 
-  LONG getId()
-      { return mRequestId; }
-  CComPtr<IFrameRecord> getFrameRecord()
-      { return mFrameRecord; }
-  CComPtr<IRequest> getRequest()
-      { return mRequest; }
-/*
-  CComPtr<IWebBrowser2> getCurrentBrowser()
-      { return mCurrentBrowser.mBrowser; }
-  CComPtr<IUri> getCurrentUri()
-      { return mCurrentBrowser.mUri; }
-  BOOL isTopLevelRequest()
-      { return mIsTopLevel; }
-  BOOL isDocumentRequest()
-      { return mFrameRecord != NULL; }
-*/
+  // getters / setters
+  DECLARE_GETTER(LONG, id) { return mRequestId; }
+  DECLARE_GETTER(EState, state) { return mState; }
+  DECLARE_GETTER(CComPtr<IFrameRecord>, frameRecord) { return mFrameRecord; }
+  DECLARE_GETTER(CComPtr<IRequest>, request) { return mRequest; }
 
   HRESULT getUri(IUri ** aUriRet);
   CComPtr<IWebRequestEvents> getSink(HRESULT & hr);  // can return a global sink object, see implementation

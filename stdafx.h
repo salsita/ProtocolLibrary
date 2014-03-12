@@ -24,6 +24,7 @@
 #include <Exdisp.h>
 #include <Exdispid.h>
 #include <SHLGUID.h>
+#include <Ctxtcall.h>
 
 using namespace ATL;
 
@@ -41,6 +42,10 @@ using namespace ATL;
   } \
   while(0)
 #endif
+
+#define DECLARE_GETTER(_type, _name) \
+  __declspec(property(get = get_##_name)) _type _name; \
+  _type get_##_name()
 
 #ifndef FORBID_COPY_CONSTRUCTOR
 #define FORBID_COPY_CONSTRUCTOR(_cls) \

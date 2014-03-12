@@ -38,10 +38,10 @@ HRESULT Request::initRequest(RequestRecord & aRecord)
 
   mIsDocument = mIsTopLevel = mCanceled = FALSE;
 
-  mRequestId = aRecord.getId();
+  mRequestId = aRecord.id;
   aRecord.getUri(&mUri.p);
 
-  CComPtr<IFrameRecord> frameRecord = aRecord.getFrameRecord();
+  CComPtr<IFrameRecord> frameRecord = aRecord.frameRecord;
   if (frameRecord) {
     frameRecord->getBrowser(&mCurrentBrowser.p);
     mIsDocument = (S_OK == frameRecord->isEqualUri(mUri));
@@ -94,7 +94,12 @@ mUri->GetAbsoluteUri(&bs);
 
 HRESULT Request::initResponse(RequestRecord & aRecord, LPCWSTR aHeaders, DWORD aResponseCode, HRESULT aOnResponseResult)
 {
-  ATLASSERT(mResponse);
+  if(!mResponse) {
+    HRESULT hr = Response::createInstance(mResponse);
+    if (FAILED(hr)) {
+      return hr;
+    }
+  }
   return static_cast<Response*>(mResponse.p)->initResponse(aRecord, aHeaders, aResponseCode, aOnResponseResult);
 }
 
