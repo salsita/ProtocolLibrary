@@ -7,17 +7,26 @@
 #include "stdafx.h"
 #include "Protocol.h"
 
-//#define PAPPTRACE
-#define PAPPTRACE(...)   ATLTRACE(__FUNCTION__);ATLTRACE(_T(": "));ATLTRACE(__VA_ARGS__)
-
 namespace protocolpatchLib
 {
+
+#define LOG_Protocol
+#ifdef LOG_Protocol
+#define Protocol_TRACE(...) \
+  ATLTRACE(__FUNCTION__); \
+  ATLTRACE(_T(": ")); \
+  ATLTRACE(__VA_ARGS__); \
+  ATLTRACE(_T("\n"));
+#else
+#define Protocol_TRACE(...)
+#endif
 
 HRESULT ProtocolStartPolicy::OnStart(
   LPCWSTR szUrl, IInternetProtocolSink *pOIProtSink,
   IInternetBindInfo *pOIBindInfo,  DWORD grfPI, HANDLE_PTR dwReserved,
   IInternetProtocol* pTargetProtocol)
 {
+  Protocol_TRACE(L"%s", szUrl);
   // Initialize the sink. This has to happen first to be able to Switch().
   Protocol * protocol = static_cast<Protocol*>(this);
   ProtocolSink* sink = GetSink(protocol);
@@ -27,7 +36,10 @@ HRESULT ProtocolStartPolicy::OnStart(
   }
 
   // And Switch() for Start() to the main thread.
-  return sink->SwitchStart();
+  Protocol_TRACE(L"SwitchStart");
+  hr = sink->SwitchStart();
+  Protocol_TRACE(L"SwitchStart 0x%08x", hr);
+  return hr;
 }
 
 //----------------------------------------------------------------------------
@@ -37,6 +49,7 @@ HRESULT ProtocolStartPolicy::OnStartEx(
   IInternetBindInfo *pOIBindInfo,  DWORD grfPI, HANDLE_PTR dwReserved,
   IInternetProtocolEx* pTargetProtocol)
 {
+  Protocol_TRACE(L"");
   // Initialize the sink. This has to happen first to be able to Switch().
   Protocol * protocol = static_cast<Protocol*>(this);
   ProtocolSink* sink = GetSink(protocol);
@@ -46,7 +59,10 @@ HRESULT ProtocolStartPolicy::OnStartEx(
   }
 
   // And Switch() for StartEx() to the main thread.
-  return sink->SwitchStartEx();
+  Protocol_TRACE(L"SwitchStartEx");
+  hr = sink->SwitchStartEx();
+  Protocol_TRACE(L"SwitchStartEx 0x%08x", hr);
+  return hr;
 }
 
 /*============================================================================
@@ -57,6 +73,7 @@ HRESULT ProtocolStartPolicy::OnStartEx(
 //  Continue
 STDMETHODIMP Protocol::Continue(PROTOCOLDATA* pProtocolData)
 {
+  Protocol_TRACE(L"");
   // If this is not an ancho related state...
   if (pProtocolData->dwState < ProtocolSink::SWITCH_BASE || pProtocolData->dwState >= ProtocolSink::SWITCH_MAX) {
     // ... just call super
@@ -76,7 +93,10 @@ STDMETHODIMP Protocol::Continue(PROTOCOLDATA* pProtocolData)
       hrRet = initRequest(sink->mStartParams.pUri, sink->mStartParams.pOIProtSink, sink->mStartParams.pOIBindInfo);
       if (SUCCEEDED(hrRet)) {
         // call Start on native protocol
-        return sink->ContinueStart();
+        Protocol_TRACE(L"ContinueStart");
+        hrRet = sink->ContinueStart();
+        Protocol_TRACE(L"ContinueStart 0x%08x", hrRet);
+        return hrRet;
       }
     } break;
 
@@ -84,15 +104,22 @@ STDMETHODIMP Protocol::Continue(PROTOCOLDATA* pProtocolData)
       hrRet = initRequest(sink->mStartParams.pUri, sink->mStartParams.pOIProtSink, sink->mStartParams.pOIBindInfo);
       if (SUCCEEDED(hrRet)) {
         // call StartEx on native protocol
-        return sink->ContinueStartEx();
+        Protocol_TRACE(L"ContinueStartEx");
+        hrRet = sink->ContinueStartEx();
+        Protocol_TRACE(L"ContinueStartEx 0x%08x", hrRet);
+        return hrRet;
       }
     } break;
 
     case ProtocolSink::SWITCH_REPORT_RESULT: {
-      return sink->ContinueReportResult();
+      Protocol_TRACE(L"ContinueReportResult");
+      hrRet = sink->ContinueReportResult();
+      Protocol_TRACE(L"ContinueReportResult 0x%08x", hrRet);
+      return hrRet;
     } break;
   }
 
+  Protocol_TRACE(L"0x%08x", hrRet);
   return hrRet;
 }
 
@@ -136,7 +163,10 @@ HRESULT Protocol::initRequest(IUri *pUri,
     }
   }
 
-  return GetSink()->initRequest(mFrameRecord, pUri, (threadRecord) ? threadRecord->getThreadId() : 0);
+  Protocol_TRACE(L"initRequest");
+  HRESULT hr = GetSink()->initRequest(mFrameRecord, pUri, (threadRecord) ? threadRecord->getThreadId() : 0);
+  Protocol_TRACE(L"initRequest 0x%08x", hr);
+  return hr;
 }
 
 } // namespace protocolpatchLib

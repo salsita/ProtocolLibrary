@@ -12,11 +12,16 @@
 namespace protocolpatchLib
 {
 
+//#define LOG_FrameRecord
+#ifdef LOG_FrameRecord
 #define FrameRecord_TRACE(...) \
   ATLTRACE(__FUNCTION__); \
   ATLTRACE(_T(": ")); \
   ATLTRACE(__VA_ARGS__); \
   ATLTRACE(_T("\n"));
+#else
+#define FrameRecord_TRACE(...)
+#endif
 
 //--------------------------------------------------------------------------
 // createInstance

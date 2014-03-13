@@ -190,7 +190,7 @@ private:  // types
 
 // ---------------------------------------------------------------------------
 private:  // methods
-  HRESULT beforeRequest(BOOL & aRedirected);
+  HRESULT beforeRequest();
 
 // ---------------------------------------------------------------------------
 private:  // members

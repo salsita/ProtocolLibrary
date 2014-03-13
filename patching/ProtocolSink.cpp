@@ -10,6 +10,17 @@
 namespace protocolpatchLib
 {
 
+#define LOG_ProtocolSink
+#ifdef LOG_ProtocolSink
+#define ProtocolSink_TRACE(...) \
+  ATLTRACE(__FUNCTION__); \
+  ATLTRACE(_T(": ")); \
+  ATLTRACE(__VA_ARGS__); \
+  ATLTRACE(_T("\n"));
+#else
+#define ProtocolSink_TRACE(...)
+#endif
+
 /*============================================================================
  * class ProtocolSink
  */
@@ -87,13 +98,16 @@ HRESULT ProtocolSink::ContinueStart()
   if (!mStartParams.pTargetProtocol) {
     return E_UNEXPECTED;
   }
+  ProtocolSink_TRACE(L"%s", mStartParams.sUri);
   // Actually start the request by calling Start() on the native protocol
-  return mStartParams.pTargetProtocol->Start(
+  HRESULT hr = mStartParams.pTargetProtocol->Start(
             mStartParams.sUri,
             this,
             this,
             mStartParams.grfPI,
             mStartParams.dwReserved);
+  ProtocolSink_TRACE(L"0x%08x", hr);
+  return hr;
 }
 
 //----------------------------------------------------------------------------
@@ -104,13 +118,16 @@ HRESULT ProtocolSink::ContinueStartEx()
   if (!targetProtocolEx) {
     return E_NOINTERFACE;
   }
+  ProtocolSink_TRACE(L"%s", mStartParams.sUri);
   // Actually start the request by calling StartEx() on the native protocol
-  return targetProtocolEx->StartEx(
+  HRESULT hr = targetProtocolEx->StartEx(
             mStartParams.pUri,
             this,
             this,
             mStartParams.grfPI,
             mStartParams.dwReserved);
+  ProtocolSink_TRACE(L"0x%08x", hr);
+  return hr;
 }
 
 //----------------------------------------------------------------------------
@@ -118,9 +135,11 @@ HRESULT ProtocolSink::ContinueStartEx()
 HRESULT ProtocolSink::ContinueReportResult()
 {
   ATLASSERT(m_spInternetProtocolSink != 0);
+  ProtocolSink_TRACE(L"0x%08x - %i - \"%s\"", mReportResultParams.hrResult, mReportResultParams.dwError, mReportResultParams.szResult);
   HRESULT hr = (m_spInternetProtocolSink)
       ? m_spInternetProtocolSink->ReportResult(mReportResultParams.hrResult, mReportResultParams.dwError, mReportResultParams.szResult)
       : S_OK;
+  ProtocolSink_TRACE(L"0x%08x", hr);
   if (FAILED(hr)) {
     return hr;
   }
@@ -147,6 +166,7 @@ HRESULT ProtocolSink::OnStart(
   IInternetBindInfo *pOIBindInfo,  DWORD grfPI, HANDLE_PTR dwReserved,
   IInternetProtocol* pTargetProtocol)
 {
+  ProtocolSink_TRACE(L"%s", szUrl);
   // initialize internal members
   HRESULT hr = __super::OnStart(szUrl, pOIProtSink, pOIBindInfo, grfPI, dwReserved, pTargetProtocol);
   if (FAILED(hr)) {
@@ -195,13 +215,14 @@ HRESULT ProtocolSink::OnStartEx(
   CComBSTR bs;
   hr = pUri->GetAbsoluteUri(&bs);
   mStartParams.sUri = bs;
+  ProtocolSink_TRACE(L"%s", bs);
 
   return hr;
 }
 
 //----------------------------------------------------------------------------
 //  beforeRequest
-HRESULT ProtocolSink::beforeRequest(BOOL & aRedirected)
+HRESULT ProtocolSink::beforeRequest()
 {
   // get the "Accept" header for the request type
   // (http://developer.chrome.com/extensions/webRequest.html#event-onBeforeRequest)
@@ -228,10 +249,12 @@ HRESULT ProtocolSink::beforeRequest(BOOL & aRedirected)
   }
 
   CComPtr<IUri> redirectUri;
+  ProtocolSink_TRACE(L"fire_onBeforeRequest %s", mRequestRecord.mUrlString);
   // fire event
   HRESULT hr = mRequestRecord.fire_onBeforeRequest(requestType, &redirectUri.p);
   if (E_ABORT == hr) {
-    ReportResult(hr, 0, L"aborted");
+   ProtocolSink_TRACE(L"aborted %s", mRequestRecord.mUrlString);
+   ReportResult(hr, 0, L"aborted");
     return hr;
   }
 
@@ -239,10 +262,12 @@ HRESULT ProtocolSink::beforeRequest(BOOL & aRedirected)
   if (redirectUri) {
     CComBSTR url;
     redirectUri->GetAbsoluteUri(&url);
+    ProtocolSink_TRACE(L"DO redirect to %s", url);
     ReportProgress(64, L"302");
     ReportProgress(BINDSTATUS_REDIRECTING, url);
-    ReportResult(INET_E_REDIRECT_FAILED, 0, url);
-    aRedirected = TRUE;
+    ReportResult(INET_E_REDIRECTING, 0, url);
+    ProtocolSink_TRACE(L"return INET_E_REDIRECTING");
+    return INET_E_REDIRECTING;
   }
 
   return S_OK;
@@ -290,21 +315,24 @@ STDMETHODIMP ProtocolSink::BeginningTransaction(
   }
 
   // fire onBeforeRequest first
-  BOOL redirected = FALSE;
-  HRESULT hr = beforeRequest(redirected);
+  ProtocolSink_TRACE(L"beforeRequest %s", szURL);
+  HRESULT hr = beforeRequest();
+  if (INET_E_REDIRECTING == hr) {
+    ProtocolSink_TRACE(L"==> redirect %s ==>", szURL);
+    return hr;
+  }
   if (FAILED(hr)) {
     return hr;
   }
-  if (redirected) {
-    return S_OK;
-  }
 
+  ProtocolSink_TRACE(L"fire_onBeforeSendHeaders %s", szURL);
   // then fire onBeforeSendHeaders
   hr = mRequestRecord.fire_onBeforeSendHeaders(m_bindVerb, sHdrs);
   if (FAILED(hr)) {
     return hr;
   }
 
+  ProtocolSink_TRACE(L"BeginningTransaction on original %s", szURL);
   LPWSTR additionalHeaders = NULL;
   hr = (spHttpNegotiate)
       ? spHttpNegotiate->BeginningTransaction(szURL, sHdrs, dwReserved, &additionalHeaders)
@@ -356,6 +384,7 @@ STDMETHODIMP ProtocolSink::ReportProgress(
   /* [in] */ LPCWSTR szStatusText)
 {
   if (ulStatusCode == BINDSTATUS_REDIRECTING) {
+    ProtocolSink_TRACE(L"==> redirecting ==> %s", szStatusText);
     HRESULT hr = mRequestRecord.fire_onBeforeRedirect(szStatusText);
     if (E_ABORT == hr) {
       return hr;
@@ -388,6 +417,7 @@ STDMETHODIMP ProtocolSink::ReportResult(
   /* [in] */ DWORD dwError,
   /* [in] */ LPCWSTR szResult)
 {
+  ProtocolSink_TRACE(L"0x%08x - %i - \"%s\"", hrResult, dwError, szResult);
   if (hrResult == 0) {
     // NOTE: We are already on the document thread here, but we still Switch()
     // because we are not able to get a html document at this state of the request.
