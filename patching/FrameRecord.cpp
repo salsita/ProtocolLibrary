@@ -1,6 +1,6 @@
 /****************************************************************************
  * FrameRecord.cpp : Implementation of FrameRecord
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 
@@ -12,19 +12,24 @@
 namespace protocolpatchLib
 {
 
+//#define LOG_FrameRecord
+#ifdef LOG_FrameRecord
 #define FrameRecord_TRACE(...) \
   ATLTRACE(__FUNCTION__); \
   ATLTRACE(_T(": ")); \
   ATLTRACE(__VA_ARGS__); \
   ATLTRACE(_T("\n"));
+#else
+#define FrameRecord_TRACE(...)
+#endif
 
 //--------------------------------------------------------------------------
 // createInstance
 //  static creator method
 CComPtr<IFrameRecord> FrameRecord::createInstance(
     IWebRequestEvents * aEventSink,
-      IWebBrowser2 * aBrowser,
-      BOOL aIsTopLevel)
+    IWebBrowser2 * aBrowser,
+    BOOL aIsTopLevel)
 {
   _ComObject * newInstance = NULL;
   if (SUCCEEDED(_ComObject::CreateInstance(&newInstance))) {
@@ -48,7 +53,7 @@ HRESULT FrameRecord::createUriNoFragment(IUri * aUri, IUri ** aRetVal)
     return hr;
   }
   uriBuilder->SetFragment(NULL);
-  return uriBuilder->CreateUri(Uri_CREATE_CANONICALIZE, 0, 0, aRetVal);
+  return uriBuilder->CreateUri(Uri_CREATE_CANONICALIZE | Uri_CREATE_NO_DECODE_EXTRA_INFO, 0, 0, aRetVal);
 }
 
 //--------------------------------------------------------------------------
@@ -97,7 +102,7 @@ STDMETHODIMP FrameRecord::cleanup()
 
 //--------------------------------------------------------------------------
 // beforeNavigate
-//  Called from within OnBeforeNavigate2() to update our internal data 
+//  Called from within OnBeforeNavigate2() to update our internal data
 STDMETHODIMP FrameRecord::beforeNavigate(LPCWSTR aUrl, IWebBrowser2 * aBrowser)
 {
   if (aBrowser) {
@@ -111,7 +116,7 @@ STDMETHODIMP FrameRecord::beforeNavigate(LPCWSTR aUrl, IWebBrowser2 * aBrowser)
 STDMETHODIMP FrameRecord::setUri(LPCWSTR aNewUri)
 {
   CComPtr<IUri> uri;
-  HRESULT hr = ::CreateUri(aNewUri, Uri_CREATE_CANONICALIZE, 0, &uri);
+  HRESULT hr = ::CreateUri(aNewUri, Uri_CREATE_CANONICALIZE | Uri_CREATE_NO_DECODE_EXTRA_INFO, 0, &uri);
   if (FAILED(hr)) {
     // NOTE: A failure might happen here. File URLs from
     // OnBrowserBeforeNavigate2 for example are passed

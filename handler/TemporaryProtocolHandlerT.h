@@ -1,6 +1,14 @@
+/****************************************************************************
+ * TemporaryProtocolHandlerT.h : Declaration of CTemporaryProtocolHandlerT
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
+
 #pragma once
 
 #include <atlfile.h>
+
+#define PROTOCOL_HANDLER_SWITCH 50000
 
 /*****************************************************************************
  * class CTemporaryProtocolHandlerT
@@ -23,8 +31,7 @@ public:
   virtual ~CTemporaryProtocolHandlerT()
   {
     // !!! raw pointer !!!
-    if (m_pFactory)
-    {
+    if (m_pFactory) {
       m_pFactory->Release();
       m_pFactory = NULL;
     }
@@ -66,8 +73,7 @@ public:
     HANDLE_PTR dwReserved)
 
   {
-    if (!m_pFactory)
-    {
+    if (!m_pFactory) {
       return E_UNEXPECTED;
     }
 
@@ -75,73 +81,84 @@ public:
     m_URI.Release();
     IF_FAILED_RET(::CreateUri(szUrl, Uri_CREATE_CANONICALIZE, 0, &m_URI));
 
-    CComBSTR bs;
+    PROTOCOLDATA pd;
+    pd.cbData = sizeof(IInternetProtocolSink*);
+    pd.dwState = PROTOCOL_HANDLER_SWITCH;
+    pd.pData = pOIProtSink;
+    pOIProtSink->AddRef();
+    pd.grfFlags = PD_FORCE_SWITCH | PI_FORCE_ASYNC;
+    pOIProtSink->Switch(&pd);
 
-    // get and check scheme
-    IF_FAILED_RET(m_URI->GetSchemeName(&bs));
-    if (!m_pFactory->CheckScheme(bs))
-    {
-      return INET_E_INVALID_URL;  // not our protocol, don't translate
-    }
-
-    // get and check host name
-    bs.Empty();
-    IF_FAILED_RET(m_URI->GetHost(&bs));
-
-    // prepare request: check and get host info
-    if (!m_pFactory->GetResourceInfo(bs, m_HostInfo))
-    {
-      return INET_E_INVALID_URL;  // not our host, don't translate
-    }
-
-    // get path
-    CStringW sPath, sExtension;
-    bs.Empty();
-    IF_FAILED_RET(m_URI->GetPath(&bs));
-    sPath = bs;
-
-    // get extension
-    bs.Empty();
-    IF_FAILED_RET(m_URI->GetExtension(&bs));
-    sExtension = bs;
-
-    // unescape path
-    DWORD dw = INTERNET_MAX_URL_LENGTH;
-    UrlUnescape(sPath.GetBuffer(dw), 0, &dw, URL_UNESCAPE_INPLACE);
-    sPath.ReleaseBuffer();
-
-    // get mimetype from extension
-    CStringW sMime(_T("application/octet-stream"));
-    GetMimeType(sExtension, sMime);
-
-    // let derived class init the request
-    DWORD sz = 0;
-    m_SpecialURLResource.clear();
-    CComQIPtr<IProtocolMemoryResource> memoryResource(m_pFactory);
-    if (memoryResource && SUCCEEDED(memoryResource->GetResource(m_URI, m_SpecialURLResource))) {
-      sz = m_SpecialURLResource.mLength;
-    }
-    else {
-      m_SpecialURLResource.clear(); // make sure we don't have stale data
-      IF_FAILED_RET(static_cast<T*>(this)->InitializeRequest(sPath, sz));
-    }
-
-    // serve the request to pOIProtSink
-    pOIProtSink->ReportProgress(BINDSTATUS_FINDINGRESOURCE, L"Found");
-    pOIProtSink->ReportProgress(BINDSTATUS_CONNECTING, L"Connecting");
-    pOIProtSink->ReportProgress(BINDSTATUS_SENDINGREQUEST, L"Sending");
-    pOIProtSink->ReportProgress(BINDSTATUS_VERIFIEDMIMETYPEAVAILABLE, sMime);
-    pOIProtSink->ReportData(BSCF_FIRSTDATANOTIFICATION, 0, sz);
-    pOIProtSink->ReportData(BSCF_LASTDATANOTIFICATION | BSCF_DATAFULLYAVAILABLE, sz, sz);
-
-    pOIProtSink->ReportResult(S_OK, 0, NULL);
     return S_OK;
   }
-
 
   STDMETHOD(Continue)(
     PROTOCOLDATA *pProtocolData)
   {
+    if (pProtocolData->dwState == PROTOCOL_HANDLER_SWITCH) {
+      CComPtr<IInternetProtocolSink> pOIProtSink;
+      pOIProtSink.Attach((IInternetProtocolSink *) pProtocolData->pData);
+      pProtocolData->pData = NULL;
+
+      CComBSTR bs;
+      // get and check host name
+      bs.Empty();
+      IF_FAILED_RET(m_URI->GetHost(&bs));
+
+      // prepare request: check and get host info
+      if (!m_pFactory->GetResourceInfo(bs, m_HostInfo)) {
+        return INET_E_INVALID_URL;  // not our host, don't translate
+      }
+
+      // get and check scheme
+      IF_FAILED_RET(m_URI->GetSchemeName(&bs));
+      if (!m_pFactory->CheckScheme(bs)) {
+        return INET_E_INVALID_URL;  // not our protocol, don't translate
+      }
+
+      // get path
+      CStringW sPath, sExtension;
+      bs.Empty();
+      IF_FAILED_RET(m_URI->GetPath(&bs));
+      sPath = bs;
+
+      // get extension
+      bs.Empty();
+      IF_FAILED_RET(m_URI->GetExtension(&bs));
+      sExtension = bs;
+
+      // unescape path
+      DWORD dw = INTERNET_MAX_URL_LENGTH;
+      UrlUnescape(sPath.GetBuffer(dw), 0, &dw, URL_UNESCAPE_INPLACE);
+      sPath.ReleaseBuffer();
+
+      // get mimetype from extension
+      CStringW sMime(_T("application/octet-stream"));
+      GetMimeType(sExtension, sMime);
+
+      // let derived class init the request
+      DWORD sz = 0;
+      m_SpecialURLResource.clear();
+      CComQIPtr<IProtocolMemoryResource> memoryResource(m_pFactory);
+      if (memoryResource && SUCCEEDED(memoryResource->GetResource(m_URI, m_SpecialURLResource))) {
+        sz = m_SpecialURLResource.mLength;
+      }
+      else {
+        m_SpecialURLResource.clear(); // make sure we don't have stale data
+        IF_FAILED_RET(static_cast<T*>(this)->InitializeRequest(sPath, sz));
+      }
+
+      // serve the request to pOIProtSink
+      pOIProtSink->ReportProgress(BINDSTATUS_FINDINGRESOURCE, L"Found");
+      pOIProtSink->ReportProgress(BINDSTATUS_CONNECTING, L"Connecting");
+      pOIProtSink->ReportProgress(BINDSTATUS_SENDINGREQUEST, L"Sending");
+      pOIProtSink->ReportProgress(BINDSTATUS_VERIFIEDMIMETYPEAVAILABLE, sMime);
+      pOIProtSink->ReportData(BSCF_FIRSTDATANOTIFICATION, 0, sz);
+      pOIProtSink->ReportData(BSCF_LASTDATANOTIFICATION | BSCF_DATAFULLYAVAILABLE, sz, sz);
+
+      pOIProtSink->ReportResult(S_OK, 200, NULL);
+    }
+
     return S_OK;
   }
 
@@ -179,15 +196,13 @@ public:
     DWORD *pcchResult,
     DWORD dwReserved)
   {
-    if (!m_pFactory)
-    {
+    if (!m_pFactory) {
       return E_UNEXPECTED;
     }
     if (!m_URI) {
       CreateUri(pwzUrl, Uri_CREATE_CANONICALIZE, 0, &m_URI);
     }
-    switch(ParseAction)
-    {
+    switch(ParseAction) {
       case PARSE_SECURITY_URL:
       case PARSE_SECURITY_DOMAIN:
         {
@@ -200,16 +215,14 @@ public:
 
           // get and check scheme
           IF_FAILED_RET(m_URI->GetSchemeName(&bsScheme));
-          if (!m_pFactory->CheckScheme(bsScheme))
-          {
+          if (!m_pFactory->CheckScheme(bsScheme)) {
             return INET_E_DEFAULT_ACTION;  // not our protocol
           }
 
           // get and check host name
           IF_FAILED_RET(m_URI->GetHost(&bsHost));
           HI hostInfo;
-          if (!m_pFactory->GetResourceInfo(bsHost, hostInfo))
-          {
+          if (!m_pFactory->GetResourceInfo(bsHost, hostInfo)) {
             return INET_E_DEFAULT_ACTION;  // not our host
           }
 
@@ -275,16 +288,14 @@ public:
 
       // get and check scheme
       IF_FAILED_RET(m_URI->GetSchemeName(&bsScheme));
-      if (!m_pFactory->CheckScheme(bsScheme))
-      {
+      if (!m_pFactory->CheckScheme(bsScheme)) {
         return INET_E_DEFAULT_ACTION;  // not our protocol
       }
 
       // get and check host name
       IF_FAILED_RET(m_URI->GetHost(&bsHost));
       HI hostInfo;
-      if (!m_pFactory->GetResourceInfo(bsHost, hostInfo))
-      {
+      if (!m_pFactory->GetResourceInfo(bsHost, hostInfo)) {
         return INET_E_DEFAULT_ACTION;  // not our host
       }
       *pcbBuf = 4;
@@ -304,8 +315,7 @@ protected:
   // and the root folder
   HRESULT Init(CF * pFactory)
   {
-    if (!pFactory)
-    {
+    if (!pFactory) {
       return E_INVALIDARG;
     }
     // !!! raw pointer !!!
@@ -320,16 +330,14 @@ protected:
   {
     CRegKey regKey;
     LONG res = regKey.Open(HKEY_CLASSES_ROOT, lpszExtension, KEY_READ);
-    if (ERROR_SUCCESS != res)
-    {
+    if (ERROR_SUCCESS != res) {
       return FALSE;
     }
     CStringW s;
     ULONG nChars = 1000;
     res = regKey.QueryStringValue(_T("Content Type"), s.GetBuffer(nChars), &nChars);
     s.ReleaseBuffer();
-    if (ERROR_SUCCESS != res)
-    {
+    if (ERROR_SUCCESS != res) {
       return FALSE;
     }
     sMimeType = s;
@@ -343,14 +351,12 @@ protected:
       DWORD *pcchResult)
   {
     DWORD len = SysStringLen(aSource);
-    if (cchResult < (len+1))
-    {
+    if (cchResult < (len+1)) {
       // not enough room to swing a cat here..
       return S_FALSE;
     }
     wcscpy_s(pwzResult, cchResult, aSource);
-    if (pcchResult)
-    {
+    if (pcchResult) {
       *pcchResult = len;
     }
     return S_OK;

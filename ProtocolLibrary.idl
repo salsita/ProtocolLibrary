@@ -266,9 +266,9 @@ library protocolpatchLib
   ]
   interface IProtPatchApplication : IUnknown
   {
-    HRESULT patchProtokol([in] Scheme aScheme, [in] BOOL aUseVTablePatching);
-    HRESULT unpatchProtokol([in] Scheme aScheme);
-    HRESULT enableProtokol([in] Scheme aScheme, [in] BOOL aEnable);
+    HRESULT patchProtocol([in] Scheme aScheme, [in] BOOL aUseVTablePatching);
+    HRESULT unpatchProtocol([in] Scheme aScheme);
+    HRESULT enableProtocol([in] Scheme aScheme, [in] BOOL aEnable);
 
     //-------------------------------------------------------------------------
     // registers a temporary file protocol of the form

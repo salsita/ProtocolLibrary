@@ -36,15 +36,13 @@ HRESULT CTemporaryProtocolResourceHandlerClassFactory::AddHost(
   // note that the library stays loaded until the process terminates
   HINSTANCE hInstResources =
         ::LoadLibraryEx(lpszFileName, NULL, LOAD_LIBRARY_AS_DATAFILE);
-  if (!hInstResources)
-  {
+  if (!hInstResources) {
     DWORD dw = GetLastError();
     return HRESULT_FROM_WIN32(dw);
   }
 
   HRESULT hr = AddHost(lpszHost, hInstResources);
-  if (FAILED(hr))
-  {
+  if (FAILED(hr)) {
     ::FreeLibrary(hInstResources);
   }
   return hr;
@@ -59,15 +57,13 @@ HRESULT CTemporaryProtocolResourceHandlerClassFactory::AddHost(
   CritSectLock lock(m_CriticalSection);
 
   // check arguments
-  if (!wcslen(lpszHost) || !hInstResources)
-  {
+  if (!wcslen(lpszHost) || !hInstResources) {
     return E_INVALIDARG;
   }
 
   // lookup host if we have already
   ResourceHandlerHostInfo hostInfo;
-  if (LookupHostInfo(lpszHost, hostInfo))
-  {
+  if (LookupHostInfo(lpszHost, hostInfo)) {
     // found
     return S_FALSE;
   }

@@ -29,8 +29,7 @@ const GUID CTemporaryProtocolResourceHandler::CLSID =
 void CTemporaryProtocolResourceHandler::FreeResources()
 {
   m_SpecialURLResource.clear();
-  if (m_hGlobalResource)
-  {
+  if (m_hGlobalResource) {
     FreeResource(m_hGlobalResource);
   }
   m_hrc = NULL;
@@ -72,14 +71,12 @@ HRESULT CTemporaryProtocolResourceHandler::InitializeRequest(
   sPath.Replace(_T('/'), _T('|'));
 
   m_hrc = FindResource(m_HostInfo.hResourceInstance, sPath, RT_HTML);
-  if (NULL == m_hrc)
-  {
+  if (NULL == m_hrc) {
     return INET_E_OBJECT_NOT_FOUND;
   }
 
   m_hGlobalResource = LoadResource(m_HostInfo.hResourceInstance, m_hrc);
-  if (!m_hGlobalResource)
-  {
+  if (!m_hGlobalResource) {
     return INET_E_OBJECT_NOT_FOUND;
   }
 

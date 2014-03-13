@@ -58,8 +58,8 @@ HRESULT CTemporaryProtocolFolderHandler::InitializeRequest(
   IF_FAILED_RET(m_File.GetSize(fileLength));
 
   // only files <4GB supported
-  if (fileLength > 0x00000000ffffffff)
-  {
+  if (fileLength > 0x00000000ffffffff) {
+    ATLASSERT(0 && L"only files <4GB supported");
     return INET_E_OBJECT_NOT_FOUND;
   }
   dwSize = (DWORD)fileLength;
@@ -78,8 +78,7 @@ STDMETHODIMP CTemporaryProtocolFolderHandler::Read(
   }
   DWORD bytesRead = 0;
   HRESULT hr = m_File.Read(pv, cb, bytesRead);
-  if (pcbRead)
-  {
+  if (pcbRead) {
     (*pcbRead) = bytesRead;
   }
   if (FAILED(hr)) {
@@ -109,8 +108,7 @@ STDMETHODIMP CTemporaryProtocolFolderHandler::Seek(
   }
   // simply forward to file
   IF_FAILED_RET(m_File.Seek(dlibMove.QuadPart, dwOrigin));
-  if (plibNewPosition)
-  {
+  if (plibNewPosition) {
     IF_FAILED_RET(m_File.GetPosition(plibNewPosition->QuadPart));
   }
   return S_OK;

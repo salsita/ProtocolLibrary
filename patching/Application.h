@@ -56,9 +56,9 @@ public:
 public:
   //--------------------------------------------------------------------------
   // IProtPatchApplication
-  STDMETHOD(patchProtokol)(Scheme aScheme, BOOL aUseVTablePatching);
-  STDMETHOD(unpatchProtokol)(Scheme aScheme);
-  STDMETHOD(enableProtokol)(Scheme aScheme, BOOL aEnable);
+  STDMETHOD(patchProtocol)(Scheme aScheme, BOOL aUseVTablePatching);
+  STDMETHOD(unpatchProtocol)(Scheme aScheme);
+  STDMETHOD(enableProtocol)(Scheme aScheme, BOOL aEnable);
 
   //-------------------------------------------------------------------------
   // registers a temporary file protocol of the form

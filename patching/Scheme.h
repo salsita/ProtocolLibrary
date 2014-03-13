@@ -1,6 +1,6 @@
 /****************************************************************************
  * Scheme.h : Scheme enum and traits.
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 #pragma once
@@ -9,7 +9,6 @@
 
 namespace protocolpatchLib
 {
-
 
 //--------------------------------------------------------------------------
 // Scheme traits: Scheme enum and CLSID.
@@ -29,6 +28,7 @@ template <Scheme S>
 public:
   // not implemented
   static const IID & getCLSID();
+  static LPCWSTR getSchemeName();
 };
 
 //--------------------------------------------------------------------------
@@ -40,6 +40,8 @@ template<>
 public:
   static const IID & getCLSID()
       { return CLSID_HttpProtocol; }
+  static LPCWSTR getSchemeName()
+      { return L"http"; }
 };
 typedef SchemeTraits<SCHEME_HTTP> HTTP_Traits;
 
@@ -52,6 +54,8 @@ template<>
 public:
   static const IID & getCLSID()
       { return CLSID_HttpSProtocol; }
+  static LPCWSTR getSchemeName()
+      { return L"https"; }
 };
 typedef SchemeTraits<SCHEME_HTTP_S> HTTP_S_Traits;
 

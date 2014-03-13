@@ -35,15 +35,13 @@ HRESULT CTemporaryProtocolFolderHandlerClassFactory::AddHost(
   CritSectLock lock(m_CriticalSection);
 
   // check arguments
-  if (!wcslen(lpszHost) || !wcslen(lpszFolderName))
-  {
+  if (!wcslen(lpszHost) || !wcslen(lpszFolderName)) {
     return E_INVALIDARG;
   }
 
   // lookup host if we have already
   FolderHandlerHostInfo hostInfo;
-  if (LookupHostInfo(lpszHost, hostInfo))
-  {
+  if (LookupHostInfo(lpszHost, hostInfo)) {
     // found
     return S_FALSE;
   }
