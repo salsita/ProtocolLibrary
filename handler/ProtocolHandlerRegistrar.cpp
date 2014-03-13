@@ -1,3 +1,9 @@
+/****************************************************************************
+ * ProtocolHandlerRegistrar.cpp : Implementation of CProtocolHandlerRegistrar
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
+
 #include "StdAfx.h"
 #include "TemporaryProtocolFolderHandler.h"
 #include "TemporaryProtocolFolderHandlerClassFactory.h"
@@ -231,4 +237,3 @@ HRESULT CProtocolHandlerRegistrar::UnregisterTemporaryHandler(
 
   return S_OK;
 }
-

@@ -22,55 +22,55 @@ namespace Detail
 template <typename T, typename Default>
 struct ChooseCreatorClass
 {
-	typedef Default _CreatorClass;
-	struct Derived : private T
-	{
-		typedef _CreatorClass CreatorClass;
-	};
-	typedef typename Derived::CreatorClass CreatorClass;
+  typedef Default _CreatorClass;
+  struct Derived : private T
+  {
+    typedef _CreatorClass CreatorClass;
+  };
+  typedef typename Derived::CreatorClass CreatorClass;
 };
 
 } // end namespace PassthroughAPP::Detail
 
 class ATL_NO_VTABLE CComClassFactoryProtocol :
-	public CComClassFactory
+  public CComClassFactory
 {
-	typedef CComClassFactory BaseClass;
+  typedef CComClassFactory BaseClass;
 public:
-	STDMETHODIMP CreateInstance(IUnknown* punkOuter, REFIID riid,
-		void** ppvObj);
+  STDMETHODIMP CreateInstance(IUnknown* punkOuter, REFIID riid,
+    void** ppvObj);
 
-//	HRESULT CreateInstanceTarget(IUnknown** ppTargetProtocol);
+  HRESULT CreateInstanceTarget(IUnknown** ppTargetProtocol);
 
-	HRESULT GetTargetClassFactory(IClassFactory** ppCF);
-	HRESULT SetTargetClassFactory(IClassFactory* pCF);
-	HRESULT SetTargetCLSID(REFCLSID clsid, DWORD clsContext = CLSCTX_ALL);
+  HRESULT GetTargetClassFactory(IClassFactory** ppCF);
+  HRESULT SetTargetClassFactory(IClassFactory* pCF);
+  HRESULT SetTargetCLSID(REFCLSID clsid, DWORD clsContext = CLSCTX_ALL);
 
-	void FinalRelease();
+  void FinalRelease();
 private:
-	CComPtr<IClassFactory> m_spTargetCF;
+  CComPtr<IClassFactory> m_spTargetCF;
 };
 
 template <class Factory, class Protocol,
-	class FactoryComObject = CComObjectNoLock<Factory> >
+  class FactoryComObject = CComObjectNoLock<Factory> >
 struct CMetaFactory
 {
-	typedef
-		CComCreator2<CComCreator<CComObject<Protocol> >,
-			CComCreator<CComAggObject<Protocol> > >
-	DefaultCreatorClass;
+  typedef
+    CComCreator2<CComCreator<CComObject<Protocol> >,
+      CComCreator<CComAggObject<Protocol> > >
+  DefaultCreatorClass;
 
-	typedef typename
-		Detail::ChooseCreatorClass<Protocol, DefaultCreatorClass>::CreatorClass
-			CreatorClass;
+  typedef typename
+    Detail::ChooseCreatorClass<Protocol, DefaultCreatorClass>::CreatorClass
+      CreatorClass;
 
-	// returns a non-AddRef'ed pointer to FactoryComObject, already initialized
-	// with Protocol's creator function, via ppObj [out] parameter
-	static HRESULT CreateInstance(Factory** ppObj);
+  // returns a non-AddRef'ed pointer to FactoryComObject, already initialized
+  // with Protocol's creator function, via ppObj [out] parameter
+  static HRESULT CreateInstance(Factory** ppObj);
 
-	static HRESULT CreateInstance(IClassFactory* pTargetCF,
-		IClassFactory** ppCF);
-	static HRESULT CreateInstance(REFCLSID clsidTarget, IClassFactory** ppCF);
+  static HRESULT CreateInstance(IClassFactory* pTargetCF,
+    IClassFactory** ppCF);
+  static HRESULT CreateInstance(REFCLSID clsidTarget, IClassFactory** ppCF);
 };
 
 } // end namespace PassthroughAPP

@@ -1,6 +1,14 @@
+/****************************************************************************
+ * TemporaryProtocolHandlerT.h : Declaration of CTemporaryProtocolHandlerT
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
+
 #pragma once
 
 #include <atlfile.h>
+
+#define PROTOCOL_HANDLER_SWITCH 50000
 
 /*****************************************************************************
  * class CTemporaryProtocolHandlerT
@@ -75,73 +83,86 @@ public:
     m_URI.Release();
     IF_FAILED_RET(::CreateUri(szUrl, Uri_CREATE_CANONICALIZE, 0, &m_URI));
 
-    CComBSTR bs;
+    PROTOCOLDATA pd;
+    pd.cbData = sizeof(IInternetProtocolSink*);
+    pd.dwState = PROTOCOL_HANDLER_SWITCH;
+    pd.pData = pOIProtSink;
+    pOIProtSink->AddRef();
+    pd.grfFlags = PD_FORCE_SWITCH | PI_FORCE_ASYNC;
+    pOIProtSink->Switch(&pd);
 
-    // get and check scheme
-    IF_FAILED_RET(m_URI->GetSchemeName(&bs));
-    if (!m_pFactory->CheckScheme(bs))
-    {
-      return INET_E_INVALID_URL;  // not our protocol, don't translate
-    }
-
-    // get and check host name
-    bs.Empty();
-    IF_FAILED_RET(m_URI->GetHost(&bs));
-
-    // prepare request: check and get host info
-    if (!m_pFactory->GetResourceInfo(bs, m_HostInfo))
-    {
-      return INET_E_INVALID_URL;  // not our host, don't translate
-    }
-
-    // get path
-    CStringW sPath, sExtension;
-    bs.Empty();
-    IF_FAILED_RET(m_URI->GetPath(&bs));
-    sPath = bs;
-
-    // get extension
-    bs.Empty();
-    IF_FAILED_RET(m_URI->GetExtension(&bs));
-    sExtension = bs;
-
-    // unescape path
-    DWORD dw = INTERNET_MAX_URL_LENGTH;
-    UrlUnescape(sPath.GetBuffer(dw), 0, &dw, URL_UNESCAPE_INPLACE);
-    sPath.ReleaseBuffer();
-
-    // get mimetype from extension
-    CStringW sMime(_T("application/octet-stream"));
-    GetMimeType(sExtension, sMime);
-
-    // let derived class init the request
-    DWORD sz = 0;
-    m_SpecialURLResource.clear();
-    CComQIPtr<IProtocolMemoryResource> memoryResource(m_pFactory);
-    if (memoryResource && SUCCEEDED(memoryResource->GetResource(m_URI, m_SpecialURLResource))) {
-      sz = m_SpecialURLResource.mLength;
-    }
-    else {
-      m_SpecialURLResource.clear(); // make sure we don't have stale data
-      IF_FAILED_RET(static_cast<T*>(this)->InitializeRequest(sPath, sz));
-    }
-
-    // serve the request to pOIProtSink
-    pOIProtSink->ReportProgress(BINDSTATUS_FINDINGRESOURCE, L"Found");
-    pOIProtSink->ReportProgress(BINDSTATUS_CONNECTING, L"Connecting");
-    pOIProtSink->ReportProgress(BINDSTATUS_SENDINGREQUEST, L"Sending");
-    pOIProtSink->ReportProgress(BINDSTATUS_VERIFIEDMIMETYPEAVAILABLE, sMime);
-    pOIProtSink->ReportData(BSCF_FIRSTDATANOTIFICATION, 0, sz);
-    pOIProtSink->ReportData(BSCF_LASTDATANOTIFICATION | BSCF_DATAFULLYAVAILABLE, sz, sz);
-
-    pOIProtSink->ReportResult(S_OK, 0, NULL);
     return S_OK;
   }
-
 
   STDMETHOD(Continue)(
     PROTOCOLDATA *pProtocolData)
   {
+    if (pProtocolData->dwState == PROTOCOL_HANDLER_SWITCH) {
+      CComPtr<IInternetProtocolSink> pOIProtSink;
+      pOIProtSink.Attach((IInternetProtocolSink *) pProtocolData->pData);
+      pProtocolData->pData = NULL;
+
+      CComBSTR bs;
+      // get and check host name
+      bs.Empty();
+      IF_FAILED_RET(m_URI->GetHost(&bs));
+
+      // prepare request: check and get host info
+      if (!m_pFactory->GetResourceInfo(bs, m_HostInfo))
+      {
+        return INET_E_INVALID_URL;  // not our host, don't translate
+      }
+
+      // get and check scheme
+      IF_FAILED_RET(m_URI->GetSchemeName(&bs));
+      if (!m_pFactory->CheckScheme(bs))
+      {
+        return INET_E_INVALID_URL;  // not our protocol, don't translate
+      }
+
+      // get path
+      CStringW sPath, sExtension;
+      bs.Empty();
+      IF_FAILED_RET(m_URI->GetPath(&bs));
+      sPath = bs;
+
+      // get extension
+      bs.Empty();
+      IF_FAILED_RET(m_URI->GetExtension(&bs));
+      sExtension = bs;
+
+      // unescape path
+      DWORD dw = INTERNET_MAX_URL_LENGTH;
+      UrlUnescape(sPath.GetBuffer(dw), 0, &dw, URL_UNESCAPE_INPLACE);
+      sPath.ReleaseBuffer();
+
+      // get mimetype from extension
+      CStringW sMime(_T("application/octet-stream"));
+      GetMimeType(sExtension, sMime);
+
+      // let derived class init the request
+      DWORD sz = 0;
+      m_SpecialURLResource.clear();
+      CComQIPtr<IProtocolMemoryResource> memoryResource(m_pFactory);
+      if (memoryResource && SUCCEEDED(memoryResource->GetResource(m_URI, m_SpecialURLResource))) {
+        sz = m_SpecialURLResource.mLength;
+      }
+      else {
+        m_SpecialURLResource.clear(); // make sure we don't have stale data
+        IF_FAILED_RET(static_cast<T*>(this)->InitializeRequest(sPath, sz));
+      }
+
+      // serve the request to pOIProtSink
+      pOIProtSink->ReportProgress(BINDSTATUS_FINDINGRESOURCE, L"Found");
+      pOIProtSink->ReportProgress(BINDSTATUS_CONNECTING, L"Connecting");
+      pOIProtSink->ReportProgress(BINDSTATUS_SENDINGREQUEST, L"Sending");
+      pOIProtSink->ReportProgress(BINDSTATUS_VERIFIEDMIMETYPEAVAILABLE, sMime);
+      pOIProtSink->ReportData(BSCF_FIRSTDATANOTIFICATION, 0, sz);
+      pOIProtSink->ReportData(BSCF_LASTDATANOTIFICATION | BSCF_DATAFULLYAVAILABLE, sz, sz);
+
+      pOIProtSink->ReportResult(S_OK, 200, NULL);
+    }
+
     return S_OK;
   }
 

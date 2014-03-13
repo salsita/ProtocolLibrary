@@ -1,3 +1,10 @@
+/****************************************************************************
+ * TemporaryProtocolResourceHandler.cpp : Implementation of
+ * CTemporaryProtocolResourceHandler
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
+
 #include "StdAfx.h"
 #include "TemporaryProtocolResourceHandler.h"
 #include "TemporaryProtocolResourceHandlerClassFactory.h"

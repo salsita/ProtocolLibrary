@@ -1,3 +1,9 @@
+/****************************************************************************
+ * Buffer.h : Declaration of Buffer and URLMemoryResource
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
+
 #pragma once
 
 /*****************************************************************************

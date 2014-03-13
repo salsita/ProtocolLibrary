@@ -160,4 +160,3 @@ private:
   // map for registered hosts: maps a host name to a HostInfo
   CAtlMap<CStringW, HI> m_HostInfos;
 };
-
