@@ -1,3 +1,9 @@
+/****************************************************************************
+ * ProtocolHandlerRegistrar.h : Declaration of CProtocolHandlerRegistrar
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
+
 #pragma once
 
 #include <atlcoll.h>

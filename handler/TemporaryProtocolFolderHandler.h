@@ -1,3 +1,10 @@
+/****************************************************************************
+ * TemporaryProtocolFolderHandler.h : Declaration of
+ * CTemporaryProtocolFolderHandler
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
+
 #pragma once
 
 #include <atlfile.h>

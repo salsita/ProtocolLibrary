@@ -1,6 +1,6 @@
 /****************************************************************************
  * VTablePatch.h : Patching virtual function tables.
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 
@@ -16,7 +16,6 @@ namespace protocolpatchLib
 
 // VTABLE type: a pointer to a vtable (array of PROC)
 typedef PROC* VTABLE;
-
 
 // A global map with all patched vtables. We provide this map to have a way
 // to check if a certain vtable is already patched.
@@ -124,11 +123,6 @@ protected:
   };
 };
 
-
-
-
-
-
 /*============================================================================
  * Macros for implementing urlmon patches
  */
@@ -172,7 +166,7 @@ protected:
 //  - a struct _PatchMapEntry containining a _patchFn / _restoreFn pair
 //  - a static method _getPatchMap that returns the patchmap
 #define BEGIN_PATCH_MAP(cls) \
-	typedef cls _PatchMapClass; \
+  typedef cls _PatchMapClass; \
   typedef HRESULT (_PatchMapClass::*_patchFn)(VTABLE); \
   typedef HRESULT (_PatchMapClass::*_restoreFn)(); \
   struct _PatchMapEntry { \
@@ -243,7 +237,7 @@ protected:
     if (item) { \
       return item.p->_name(); \
     } \
-    return getInst().do_##_name(aInstance); 
+    return getInst().do_##_name(aInstance);
 
 #define IMPLEMENT_ADAPTER_CALL(_name, ...)  \
     if (!getInst().isEnabled()) \
@@ -263,16 +257,5 @@ protected:
 
 // get VTABLE from IUnknown
 #define UNK_VTABLE(_unk)    (*reinterpret_cast<VTABLE*>((IUnknown*)(_unk)))
-
-
-
-
-
-
-
-
-
-
-
 
 } // namespace protocolpatchLib

@@ -1,6 +1,6 @@
 /****************************************************************************
  * FrameRecord.h : Declaration of FrameRecord
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 #pragma once
@@ -31,7 +31,7 @@ typedef IDispEventImpl<1, FrameRecord, &DIID_DWebBrowserEvents2, &LIBID_SHDocVw,
 //--------------------------------------------------------------------------
 // FrameRecord
 class ATL_NO_VTABLE FrameRecord :
-	public CComObjectRootEx<CComObjectThreadModel>,
+  public CComObjectRootEx<CComObjectThreadModel>,
   public IFrameRecord,
   public TWebBrowserEvents
 {
@@ -53,10 +53,10 @@ public:
   {
   }
 
-	DECLARE_PROTECT_FINAL_CONSTRUCT()
+  DECLARE_PROTECT_FINAL_CONSTRUCT()
 
   BEGIN_COM_MAP(FrameRecord)
-	  COM_INTERFACE_ENTRY(IFrameRecord)
+    COM_INTERFACE_ENTRY(IFrameRecord)
   END_COM_MAP()
 
   BEGIN_SINK_MAP(FrameRecord)
@@ -69,8 +69,8 @@ public:
   }
 
   void FinalRelease()
-	{
-	}
+  {
+  }
 
 public:
   // -------------------------------------------------------------------------

@@ -1,12 +1,13 @@
 /****************************************************************************
  * Application.h : Declaration of Application
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 #pragma once
 
 #include "resource.h"       // main symbols
 #include "ProtocolLibrary_i.h"
+#include "ClassFactories.h"
 #include <map>
 
 namespace protocolpatchLib
@@ -18,9 +19,9 @@ namespace protocolpatchLib
  *  HTTPS protocols, manages browser instances.
  */
 class ATL_NO_VTABLE Application :
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<Application, &CLSID_ProtPatchApplication>,
-	public IProtPatchApplication
+  public CComObjectRootEx<CComSingleThreadModel>,
+  public CComCoClass<Application, &CLSID_ProtPatchApplication>,
+  public IProtPatchApplication
 {
 public:
   //--------------------------------------------------------------------------
@@ -29,33 +30,33 @@ public:
 
   //--------------------------------------------------------------------------
   // usual stuff
-  Application()
-	{
-	}
+  Application() : mHandlerType(NONE)
+  {
+  }
 
   DECLARE_CLASSFACTORY_SINGLETON(Application)
   DECLARE_NO_REGISTRY()
   DECLARE_NOT_AGGREGATABLE(Application)
 
   BEGIN_COM_MAP(Application)
-	  COM_INTERFACE_ENTRY(IProtPatchApplication)
+    COM_INTERFACE_ENTRY(IProtPatchApplication)
   END_COM_MAP()
 
-	DECLARE_PROTECT_FINAL_CONSTRUCT()
+  DECLARE_PROTECT_FINAL_CONSTRUCT()
 
-	HRESULT FinalConstruct()
-	{
-		return S_OK;
-	}
+  HRESULT FinalConstruct()
+  {
+    return S_OK;
+  }
 
-	void FinalRelease()
-	{
-	}
+  void FinalRelease()
+  {
+  }
 
 public:
   //--------------------------------------------------------------------------
   // IProtPatchApplication
-  STDMETHOD(patchProtokol)(Scheme aScheme);
+  STDMETHOD(patchProtokol)(Scheme aScheme, BOOL aUseVTablePatching);
   STDMETHOD(unpatchProtokol)(Scheme aScheme);
   STDMETHOD(enableProtokol)(Scheme aScheme, BOOL aEnable);
 
@@ -112,14 +113,27 @@ public:
 
   STDMETHOD(watchBrowser)(IWebBrowser2* aWebBrowser, IWebRequestEvents * aEvents);
   STDMETHOD(unwatchBrowser)(IWebBrowser2* aWebBrowser, IWebRequestEvents * aEvents);
+  STDMETHOD(watchAll)(IWebRequestEvents * aEvents);
+  STDMETHOD(unwatchAll)(IWebRequestEvents * aEvents);
 
-private:  // types
+private:  // methods
   //--------------------------------------------------------------------------
-  typedef std::map<ULONG_PTR, CComPtr<IResourceRequestEvents> > ResourceRequestEventsMap;
-
+  HRESULT patchProtocolInternal(Scheme aScheme);
+  HRESULT unpatchProtocolInternal(Scheme aScheme);
+  HRESULT registerProtocolInternal(Scheme aScheme);
+  HRESULT unregisterProtocolInternal(Scheme aScheme);
 
 private:  // members
-  ResourceRequestEventsMap mResourceRequestEvents;
+  //--------------------------------------------------------------------------
+  enum THandlerType {
+    NONE,
+    PAPP,   // conventional pluggable protocol based on passthru-app
+    PATCH   // vtable patch based protocol handler
+  };
+
+  THandlerType mHandlerType;
+  CComPtr<IClassFactory> mClassFactoryHTTP;
+  CComPtr<IClassFactory> mClassFactoryHTTPS;
 };
 
 OBJECT_ENTRY_AUTO(CLSID_ProtPatchApplication, Application)

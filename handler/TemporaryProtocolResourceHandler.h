@@ -1,3 +1,10 @@
+/****************************************************************************
+ * TemporaryProtocolResourceHandler.h : Declaration of
+ * CTemporaryProtocolResourceHandler
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
+
 #pragma once
 
 #include "TemporaryProtocolHandlerT.h"
@@ -71,7 +78,7 @@ public:
 
 protected:
   //-------------------------------------------------------------------------
-  // called from CTemporaryProtocolHandlerT to get the hostname 
+  // called from CTemporaryProtocolHandlerT to get the hostname
   HRESULT InitializeRequest(LPCWSTR lpszPath, DWORD & dwSize);
 
 private:

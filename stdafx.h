@@ -12,7 +12,7 @@
 
 #define _ATL_SINGLE_THREADED
 #define _ATL_NO_AUTOMATIC_NAMESPACE
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// some CString constructors will be explicit
+#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS  // some CString constructors will be explicit
 #define ATL_NO_ASSERT_ON_DESTROY_NONEXISTENT_WINDOW
 
 #include "resource.h"
@@ -41,6 +41,10 @@ using namespace ATL;
   } \
   while(0)
 #endif
+
+#define DECLARE_GETTER(_type, _name) \
+  __declspec(property(get = get_##_name)) _type _name; \
+  _type get_##_name()
 
 #ifndef FORBID_COPY_CONSTRUCTOR
 #define FORBID_COPY_CONSTRUCTOR(_cls) \

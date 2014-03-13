@@ -1,6 +1,6 @@
 /****************************************************************************
  * GlobalMap.h : Declaration of a global Map (GlobalMapAccessor and GlobalMap)
- * Copyright 2013 Salsita (http://www.salsitasoft.com).
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
  * Author: Arne Seib <arne@salsitasoft.com>
  ****************************************************************************/
 #pragma once
@@ -79,7 +79,7 @@ public:
   size_type erase(const key_type& aUnkKey)
       { return getMap().erase(aUnkKey); }
   // erase(const_iterator)
-	iterator erase(const_iterator _Plist)
+  iterator erase(const_iterator _Plist)
       { return getMap().erase(_Plist); }
 
   // size()

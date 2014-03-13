@@ -1,3 +1,10 @@
+/****************************************************************************
+ * TemporaryProtocolFolderHandlerClassFactory.cpp : Implementation of
+ * CTemporaryProtocolFolderHandlerClassFactory
+ * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
+ * Author: Arne Seib <arne@salsitasoft.com>
+ ****************************************************************************/
+
 #include "StdAfx.h"
 
 #include "TemporaryProtocolFolderHandlerClassFactory.h"
@@ -98,4 +105,3 @@ HRESULT CTemporaryProtocolFolderHandlerClassFactory::InitHandler(
 {
   return pHandler->Init(this);
 }
-
