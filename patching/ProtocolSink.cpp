@@ -249,11 +249,15 @@ HRESULT ProtocolSink::beforeRequest()
   }
 
   CComPtr<IUri> redirectUri;
+#ifdef _DEBUG
   ProtocolSink_TRACE(L"fire_onBeforeRequest %s", mRequestRecord.mUrlString);
+#endif
   // fire event
   HRESULT hr = mRequestRecord.fire_onBeforeRequest(requestType, &redirectUri.p);
   if (E_ABORT == hr) {
+#ifdef _DEBUG
    ProtocolSink_TRACE(L"aborted %s", mRequestRecord.mUrlString);
+#endif
    ReportResult(hr, 0, L"aborted");
     return hr;
   }
