@@ -10,6 +10,7 @@ CComPtr<IThreadRecord> ThreadRecord::createInstance()
   HRESULT hr = _ComObject::CreateInstance(&newInstance);
 
   if (SUCCEEDED(hr)) {
+    ATLTRACE(_T("NEW thread record for appartment: %s\n"), newInstance->mApartmentInfo.toString());
     return newInstance;
   }
   return NULL;
@@ -128,6 +129,9 @@ STDMETHODIMP ThreadRecord::unwatchAll(IWebRequestEvents * aEvents)
 
 STDMETHODIMP ThreadRecord::onBeforeRequest(IRequest * aRequest)
 {
+  ApartmentInfo info;
+  ATLTRACE(_T("onBeforeRequest: Is same apartment: %i\n"), (info == mApartmentInfo));
+
   return CallApartment([&] () -> HRESULT {
     HRESULT hrRet = S_OK;
     for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
@@ -140,6 +144,8 @@ STDMETHODIMP ThreadRecord::onBeforeRequest(IRequest * aRequest)
 
 STDMETHODIMP ThreadRecord::onBeforeSendHeaders(IRequest * aRequest)
 {
+  ApartmentInfo info;
+  ATLTRACE(_T("onBeforeSendHeaders: Is same apartment: %i\n"), (info == mApartmentInfo));
   return CallApartment([&] () -> HRESULT {
     HRESULT hrRet = S_OK;
     for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
@@ -152,6 +158,8 @@ STDMETHODIMP ThreadRecord::onBeforeSendHeaders(IRequest * aRequest)
 
 STDMETHODIMP ThreadRecord::onBeforeRedirect(IRequest * aRequest)
 {
+  ApartmentInfo info;
+  ATLTRACE(_T("onBeforeRedirect: Is same apartment: %i\n"), (info == mApartmentInfo));
   return CallApartment([&] () -> HRESULT {
     HRESULT hrRet = S_OK;
     for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
@@ -164,6 +172,8 @@ STDMETHODIMP ThreadRecord::onBeforeRedirect(IRequest * aRequest)
 
 STDMETHODIMP ThreadRecord::onHeadersReceived(IRequest * aRequest)
 {
+  ApartmentInfo info;
+  ATLTRACE(_T("onHeadersReceived: Is same apartment: %i\n"), (info == mApartmentInfo));
   return CallApartment([&] () -> HRESULT {
     HRESULT hrRet = S_OK;
     for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
@@ -176,6 +186,8 @@ STDMETHODIMP ThreadRecord::onHeadersReceived(IRequest * aRequest)
 
 STDMETHODIMP ThreadRecord::onInteractive(IRequest * aRequest)
 {
+  ApartmentInfo info;
+  ATLTRACE(_T("onInteractive: Is same apartment: %i\n"), (info == mApartmentInfo));
   return CallApartment([&] () -> HRESULT {
     HRESULT hrRet = S_OK;
     for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {
@@ -188,6 +200,8 @@ STDMETHODIMP ThreadRecord::onInteractive(IRequest * aRequest)
 
 STDMETHODIMP ThreadRecord::onCompleted(IRequest * aRequest)
 {
+  ApartmentInfo info;
+  ATLTRACE(_T("onCompleted: Is same apartment: %i\n"), (info == mApartmentInfo));
   return CallApartment([&] () -> HRESULT {
     HRESULT hrRet = S_OK;
     for (auto it = mEvents.begin(); it != mEvents.end(); ++it) {

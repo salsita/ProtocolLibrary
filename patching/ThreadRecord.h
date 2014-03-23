@@ -89,6 +89,7 @@ private:
   typedef std::map<DWORD_PTR, CComPtr<IWebRequestEvents> > WebRequestEventsMap;
 
 private:
+  ApartmentInfo mApartmentInfo;
   static CComPtr<IThreadRecord> createInstance();
   HRESULT init(IWebBrowser2 * aBrowser);
 

@@ -114,3 +114,75 @@ protected:
 #import "U:\\Users\\Hans\\Documents\\Visual Studio 2010\\Projects\\LogServer\\LogServer\\Debug_Win32\\LogServer.tlb" named_guids raw_interfaces_only raw_native_types no_smart_pointers exclude("tagSAFEARRAYBOUND")
 using namespace LogServerLib;
 */
+
+class ApartmentInfo
+{
+private:
+  BOOL mIsValid;
+  APTTYPE mApartmentType;
+  GUID mThreadGUID;
+  THDTYPE mThreadType;
+
+public:
+  ApartmentInfo() :
+    mIsValid(FALSE),
+    mApartmentType(APTTYPE_CURRENT),
+    mThreadGUID(GUID_NULL),
+    mThreadType(THDTYPE_BLOCKMESSAGES)
+  {
+    CComPtr<IComThreadingInfo> info;
+    CoGetObjectContext(__uuidof(IComThreadingInfo), (void**)&info.p);
+    if (info) {
+      info->GetCurrentApartmentType(&mApartmentType);
+      info->GetCurrentLogicalThreadId(&mThreadGUID);
+      info->GetCurrentThreadType(&mThreadType);
+      mIsValid = TRUE;
+    }
+  }
+
+  DECLARE_GETTER(BOOL, valid) { return mIsValid; }
+  DECLARE_GETTER(APTTYPE, apartmentType) { return mApartmentType; }
+  DECLARE_GETTER(GUID, threadGUID) { return mThreadGUID; }
+  DECLARE_GETTER(THDTYPE, threadType) { return mThreadType; }
+
+  BOOL operator == (const ApartmentInfo & other)
+  {
+    return (other.mThreadGUID == mThreadGUID);
+  }
+
+  BOOL operator != (const ApartmentInfo & other)
+  {
+    return (other.mThreadGUID != mThreadGUID);
+  }
+
+  CString toString()
+  {
+    CString s;
+    OLECHAR* sGUID;
+    StringFromCLSID(mThreadGUID, &sGUID);
+    s.Format(_T("GUID: %s Type: "), sGUID);
+    ::CoTaskMemFree(sGUID);
+    switch(mApartmentType) {
+      case APTTYPE_CURRENT:
+        s += _T("CURRENT");break;
+      case APTTYPE_STA:
+        s += _T("STA");break;
+      case APTTYPE_MTA:
+        s += _T("MTA");break;
+      case APTTYPE_NA:
+        s += _T("NA");break;
+      case APTTYPE_MAINSTA:
+        s += _T("MAINSTA");break;
+    }
+    s += _T(" ThreadType: ");
+    switch(mThreadType) {
+      case THDTYPE_BLOCKMESSAGES:
+        s += _T("BLOCKMESSAGES");break;
+      case THDTYPE_PROCESSMESSAGES:
+        s += _T("PROCESSMESSAGES");break;
+    }
+    return s;
+  }
+
+};
+
