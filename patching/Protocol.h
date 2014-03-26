@@ -97,6 +97,12 @@ public: // methods
   // Fire OnFrameEnd event
   HRESULT fireOnFrameEnd(CComBSTR aUrl);
 
+  //--------------------------------------------------------------------------
+  // initRequest method: called from Start or StartEx, initializes a new
+  // request.
+  HRESULT initRequest(IUri *pUri,
+      IInternetProtocolSink *pOIProtSink,
+      IInternetBindInfo *pOIBindInfo);
 // ---------------------------------------------------------------------------
 private:  // types
   typedef std::vector<std::pair<CString, CString> > RedirectList;
@@ -104,12 +110,6 @@ private:  // types
   //==========================================================================
 
 private:  // methods
-  //--------------------------------------------------------------------------
-  // initRequest method: called from Start or StartEx, initializes a new
-  // request.
-  HRESULT initRequest(IUri *pUri,
-      IInternetProtocolSink *pOIProtSink,
-      IInternetBindInfo *pOIBindInfo);
 
 // ---------------------------------------------------------------------------
 private:  // members

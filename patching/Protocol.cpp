@@ -37,7 +37,15 @@ HRESULT ProtocolStartPolicy::OnStart(
 
   // And Switch() for Start() to the main thread.
   Protocol_TRACE(L"SwitchStart");
-  hr = sink->SwitchStart();
+  //hr = sink->SwitchStart();
+
+  hr = protocol->initRequest(sink->mStartParams.pUri, sink->mStartParams.pOIProtSink, sink->mStartParams.pOIBindInfo);
+  if (SUCCEEDED(hr)) {
+    // call Start on native protocol
+    hr = sink->ContinueStart();
+  }
+
+
   Protocol_TRACE(L"SwitchStart 0x%08x", hr);
   return hr;
 }
@@ -60,7 +68,15 @@ HRESULT ProtocolStartPolicy::OnStartEx(
 
   // And Switch() for StartEx() to the main thread.
   Protocol_TRACE(L"SwitchStartEx");
-  hr = sink->SwitchStartEx();
+  //hr = sink->SwitchStartEx();
+
+  hr = protocol->initRequest(sink->mStartParams.pUri, sink->mStartParams.pOIProtSink, sink->mStartParams.pOIBindInfo);
+  if (SUCCEEDED(hr)) {
+    // call Start on native protocol
+    hr = sink->ContinueStart();
+  }
+
+
   Protocol_TRACE(L"SwitchStartEx 0x%08x", hr);
   return hr;
 }

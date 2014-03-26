@@ -349,6 +349,7 @@ class CInternetProtocolSinkTM :
 private:
   static HRESULT WINAPI OnDelegateIID(void* pv, REFIID riid, LPVOID* ppv, DWORD_PTR dw)
   {
+    CInternetProtocolSinkTM<ThreadModel>* pself = (CInternetProtocolSinkTM<ThreadModel>*) pv;
     IInternetProtocolSink* pSink = ((CInternetProtocolSinkTM<ThreadModel> *) pv)->m_spInternetProtocolSink;
     ATLASSERT(pSink != 0);
     return pSink ? pSink->QueryInterface(riid, ppv) : E_UNEXPECTED;

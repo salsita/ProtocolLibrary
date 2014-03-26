@@ -76,6 +76,7 @@ HRESULT ProtocolSink::SwitchStartEx()
 //  SwitchReportResult
 HRESULT ProtocolSink::SwitchReportResult()
 {
+return ContinueReportResult();
   // Sometimes Continue() is not called when Switch()ing on the document
   // thread.
   // To avoid this we switch only when we are not already on the
