@@ -54,7 +54,7 @@ HRESULT RequestRecord::fire_onBeforeRequest(LPCWSTR aRequestType, IUri ** aRedir
 
     // canceled?
     if (S_OK == mRequest->isCanceled())
-      { return S_OK; }
+      { return E_ABORT; }
 
     // a redirect?
     mRequest->getRedirectUri(aRedirectUri);
