@@ -134,15 +134,6 @@ HRESULT ProtocolSink::ContinueStartEx()
 //  ContinueReportResult
 HRESULT ProtocolSink::ContinueReportResult()
 {
-  ATLASSERT(m_spInternetProtocolSink != 0);
-  ProtocolSink_TRACE(L"0x%08x - %i - \"%s\"", mReportResultParams.hrResult, mReportResultParams.dwError, mReportResultParams.szResult);
-  HRESULT hr = (m_spInternetProtocolSink)
-      ? m_spInternetProtocolSink->ReportResult(mReportResultParams.hrResult, mReportResultParams.dwError, mReportResultParams.szResult)
-      : S_OK;
-  ProtocolSink_TRACE(L"0x%08x", hr);
-  if (FAILED(hr)) {
-    return hr;
-  }
   CComPtr<IFrameRecord> frameRecord = mRequestRecord.frameRecord;
   if (frameRecord) {
     CComPtr<IWebBrowser2> browser;
@@ -254,6 +245,7 @@ HRESULT ProtocolSink::beforeRequest()
 #endif
   // fire event
   HRESULT hr = mRequestRecord.fire_onBeforeRequest(requestType, &redirectUri.p);
+
   if (E_ABORT == hr) {
 #ifdef _DEBUG
    ProtocolSink_TRACE(L"aborted %s", mRequestRecord.mUrlString);
@@ -287,7 +279,6 @@ STDMETHODIMP ProtocolSink::BeginningTransaction(
 {
   CComPtr<IHttpNegotiate> spHttpNegotiate;
   QueryServiceFromClient(&spHttpNegotiate);
-
   CStringW sHdrs;
 
   // get current headers from IWinInetHttpInfo
@@ -394,6 +385,7 @@ STDMETHODIMP ProtocolSink::ReportProgress(
       return hr;
     }
   }
+
   ATLASSERT(m_spInternetProtocolSink != 0);
   HRESULT hr = (m_spInternetProtocolSink)
       ? m_spInternetProtocolSink->ReportProgress(ulStatusCode, szStatusText)
@@ -421,6 +413,11 @@ STDMETHODIMP ProtocolSink::ReportResult(
   /* [in] */ DWORD dwError,
   /* [in] */ LPCWSTR szResult)
 {
+  ATLASSERT(m_spInternetProtocolSink != 0);
+  HRESULT hr = (m_spInternetProtocolSink)
+      ? m_spInternetProtocolSink->ReportResult(hrResult, dwError, szResult)
+      : S_OK;
+
   ProtocolSink_TRACE(L"0x%08x - %i - \"%s\"", hrResult, dwError, szResult);
   if (hrResult == 0) {
     // NOTE: We are already on the document thread here, but we still Switch()
@@ -430,13 +427,8 @@ STDMETHODIMP ProtocolSink::ReportResult(
     mReportResultParams.hrResult = hrResult;
     mReportResultParams.szResult = szResult;
     SwitchReportResult();
-    return S_OK;
   }
-
-  ATLASSERT(m_spInternetProtocolSink != 0);
-  return (m_spInternetProtocolSink)
-      ? m_spInternetProtocolSink->ReportResult(hrResult, dwError, szResult)
-      : S_OK;
+  return hr;
 }
 
 //----------------------------------------------------------------------------
