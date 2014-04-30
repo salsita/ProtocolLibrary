@@ -15,7 +15,7 @@
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS  // some CString constructors will be explicit
 #define ATL_NO_ASSERT_ON_DESTROY_NONEXISTENT_WINDOW
 
-#include "resource.h"
+#include "../dll/resource.h"
 #include <atlbase.h>
 #include <atlstr.h>
 #include <atlcom.h>
@@ -24,6 +24,9 @@
 #include <Exdisp.h>
 #include <Exdispid.h>
 #include <SHLGUID.h>
+
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
 using namespace ATL;
 

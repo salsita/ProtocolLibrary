@@ -31,8 +31,7 @@ public:
   virtual ~CTemporaryProtocolHandlerT()
   {
     // !!! raw pointer !!!
-    if (m_pFactory)
-    {
+    if (m_pFactory) {
       m_pFactory->Release();
       m_pFactory = NULL;
     }
@@ -74,8 +73,7 @@ public:
     HANDLE_PTR dwReserved)
 
   {
-    if (!m_pFactory)
-    {
+    if (!m_pFactory) {
       return E_UNEXPECTED;
     }
 
@@ -108,15 +106,13 @@ public:
       IF_FAILED_RET(m_URI->GetHost(&bs));
 
       // prepare request: check and get host info
-      if (!m_pFactory->GetResourceInfo(bs, m_HostInfo))
-      {
+      if (!m_pFactory->GetResourceInfo(bs, m_HostInfo)) {
         return INET_E_INVALID_URL;  // not our host, don't translate
       }
 
       // get and check scheme
       IF_FAILED_RET(m_URI->GetSchemeName(&bs));
-      if (!m_pFactory->CheckScheme(bs))
-      {
+      if (!m_pFactory->CheckScheme(bs)) {
         return INET_E_INVALID_URL;  // not our protocol, don't translate
       }
 
@@ -200,15 +196,13 @@ public:
     DWORD *pcchResult,
     DWORD dwReserved)
   {
-    if (!m_pFactory)
-    {
+    if (!m_pFactory) {
       return E_UNEXPECTED;
     }
     if (!m_URI) {
       CreateUri(pwzUrl, Uri_CREATE_CANONICALIZE, 0, &m_URI);
     }
-    switch(ParseAction)
-    {
+    switch(ParseAction) {
       case PARSE_SECURITY_URL:
       case PARSE_SECURITY_DOMAIN:
         {
@@ -221,16 +215,14 @@ public:
 
           // get and check scheme
           IF_FAILED_RET(m_URI->GetSchemeName(&bsScheme));
-          if (!m_pFactory->CheckScheme(bsScheme))
-          {
+          if (!m_pFactory->CheckScheme(bsScheme)) {
             return INET_E_DEFAULT_ACTION;  // not our protocol
           }
 
           // get and check host name
           IF_FAILED_RET(m_URI->GetHost(&bsHost));
           HI hostInfo;
-          if (!m_pFactory->GetResourceInfo(bsHost, hostInfo))
-          {
+          if (!m_pFactory->GetResourceInfo(bsHost, hostInfo)) {
             return INET_E_DEFAULT_ACTION;  // not our host
           }
 
@@ -296,16 +288,14 @@ public:
 
       // get and check scheme
       IF_FAILED_RET(m_URI->GetSchemeName(&bsScheme));
-      if (!m_pFactory->CheckScheme(bsScheme))
-      {
+      if (!m_pFactory->CheckScheme(bsScheme)) {
         return INET_E_DEFAULT_ACTION;  // not our protocol
       }
 
       // get and check host name
       IF_FAILED_RET(m_URI->GetHost(&bsHost));
       HI hostInfo;
-      if (!m_pFactory->GetResourceInfo(bsHost, hostInfo))
-      {
+      if (!m_pFactory->GetResourceInfo(bsHost, hostInfo)) {
         return INET_E_DEFAULT_ACTION;  // not our host
       }
       *pcbBuf = 4;
@@ -325,8 +315,7 @@ protected:
   // and the root folder
   HRESULT Init(CF * pFactory)
   {
-    if (!pFactory)
-    {
+    if (!pFactory) {
       return E_INVALIDARG;
     }
     // !!! raw pointer !!!
@@ -341,16 +330,14 @@ protected:
   {
     CRegKey regKey;
     LONG res = regKey.Open(HKEY_CLASSES_ROOT, lpszExtension, KEY_READ);
-    if (ERROR_SUCCESS != res)
-    {
+    if (ERROR_SUCCESS != res) {
       return FALSE;
     }
     CStringW s;
     ULONG nChars = 1000;
     res = regKey.QueryStringValue(_T("Content Type"), s.GetBuffer(nChars), &nChars);
     s.ReleaseBuffer();
-    if (ERROR_SUCCESS != res)
-    {
+    if (ERROR_SUCCESS != res) {
       return FALSE;
     }
     sMimeType = s;
@@ -364,14 +351,12 @@ protected:
       DWORD *pcchResult)
   {
     DWORD len = SysStringLen(aSource);
-    if (cchResult < (len+1))
-    {
+    if (cchResult < (len+1)) {
       // not enough room to swing a cat here..
       return S_FALSE;
     }
     wcscpy_s(pwzResult, cchResult, aSource);
-    if (pcchResult)
-    {
+    if (pcchResult) {
       *pcchResult = len;
     }
     return S_OK;

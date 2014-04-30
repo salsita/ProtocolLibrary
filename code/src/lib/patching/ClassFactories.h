@@ -24,8 +24,7 @@ public:
     void** ppvObj)
   {
     ATLASSERT(ppvObj != 0);
-    if (!ppvObj)
-    {
+    if (!ppvObj) {
       return E_POINTER;
     }
     *ppvObj = 0;
@@ -33,8 +32,7 @@ public:
     HRESULT hr = BaseClass::CreateInstance(punkOuter, riid,
       reinterpret_cast<void**>(&spUnkObject));
     ATLASSERT(SUCCEEDED(hr) && spUnkObject != 0);
-    if (SUCCEEDED(hr))
-    {
+    if (SUCCEEDED(hr)) {
       *ppvObj = spUnkObject.Detach();
     }
     return hr;
@@ -49,11 +47,9 @@ public:
   HRESULT SetTargetClassFactory(IClassFactory* pCF)
   {
     HRESULT hr = (pCF ? pCF->LockServer(TRUE) : S_OK);
-    if (SUCCEEDED(hr))
-    {
+    if (SUCCEEDED(hr)) {
       ObjectLock lock(this);
-      if (m_spTargetCF)
-      {
+      if (m_spTargetCF) {
         // LockServer(FALSE) is assumed to always succeed. Otherwise,
         // it is impossible to implement correct semantics
         HRESULT hr1 = m_spTargetCF->LockServer(FALSE);
@@ -71,8 +67,7 @@ public:
     HRESULT hr = CoGetClassObject(clsid, clsContext, 0, IID_IClassFactory,
       reinterpret_cast<void**>(&spTargetCF));
     ATLASSERT(SUCCEEDED(hr) && spTargetCF != 0);
-    if (SUCCEEDED(hr))
-    {
+    if (SUCCEEDED(hr)) {
       hr = SetTargetClassFactory(spTargetCF);
       ATLASSERT(SUCCEEDED(hr));
     }
@@ -82,8 +77,7 @@ public:
   void FinalRelease()
   {
     // No need to be thread safe here
-    if (m_spTargetCF)
-    {
+    if (m_spTargetCF) {
       // LockServer(FALSE) is assumed to always succeed.
       HRESULT hr = m_spTargetCF->LockServer(FALSE);
       hr;

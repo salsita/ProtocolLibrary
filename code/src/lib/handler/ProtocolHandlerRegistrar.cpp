@@ -123,8 +123,7 @@ HRESULT CProtocolHandlerRegistrar::InternalAddResource(
   IF_FAILED_RET(pURI->GetHost(&host));
 
   // lookup class factory for lpszScheme
-  if (!m_ClassFactories.Lookup(scheme, pClassFactory))
-  {
+  if (!m_ClassFactories.Lookup(scheme, pClassFactory)) {
     // a protocol handler for this scheme has to be registered first!
     return E_UNEXPECTED;
   }
@@ -154,8 +153,7 @@ HRESULT CProtocolHandlerRegistrar::RegisterTemporaryHandler(
   CComPtr<IClassFactory> pClassFactory;
 
   // lookup class factory for lpszScheme
-  if (!m_ClassFactories.Lookup(lpszScheme, pClassFactory))
-  {
+  if (!m_ClassFactories.Lookup(lpszScheme, pClassFactory)) {
     // don't have yet, create class factory object
     IF_FAILED_RET(CComObject<CF>
       ::CreateInstance(&pHandlerFactory));
@@ -166,20 +164,17 @@ HRESULT CProtocolHandlerRegistrar::RegisterTemporaryHandler(
     IF_FAILED_RET(pHandlerFactory->Init(
       lpszScheme));
   }
-  else
-  {
+  else {
     // have class factory
     registered = TRUE;
     pHandlerFactory = (CComObject<CF> *)pClassFactory.p;
   }
 
   // add the host
-  IF_FAILED_RET(pHandlerFactory->AddHost(
-    lpszHost, tResourceID));
+  IF_FAILED_RET(pHandlerFactory->AddHost(lpszHost, tResourceID));
 
   // register protocol handler
-  if (!registered)
-  {
+  if (!registered) {
     // get IInternetSession
     CComPtr<IInternetSession> pInternetSession;
     IF_FAILED_RET(CoInternetGetSession(0, &pInternetSession, 0));
@@ -207,8 +202,7 @@ HRESULT CProtocolHandlerRegistrar::UnregisterTemporaryHandler(
   CritSectLock lock(m_CriticalSection);
   // lookup classfactory object for lpszHost
   CComPtr<IClassFactory> pClassFactory;
-  if (!m_ClassFactories.Lookup(lpszScheme, pClassFactory))
-  {
+  if (!m_ClassFactories.Lookup(lpszScheme, pClassFactory)) {
     // not found
     return S_FALSE;
   }
@@ -216,8 +210,7 @@ HRESULT CProtocolHandlerRegistrar::UnregisterTemporaryHandler(
   // unregister host
   CComObject<CF> * pHandlerFactory = (CComObject<CF> *)pClassFactory.p;
   size_t registeredHosts = pHandlerFactory->RemoveHost(lpszHost);
-  if (registeredHosts > 0)
-  {
+  if (registeredHosts > 0) {
     // the handler has still registered hosts
     return S_OK;
   }
@@ -229,8 +222,7 @@ HRESULT CProtocolHandlerRegistrar::UnregisterTemporaryHandler(
   IF_FAILED_RET(CoInternetGetSession(0, &pInternetSession, 0));
 
   // unregister
-  pInternetSession->UnregisterNameSpace(pClassFactory,
-      lpszScheme);
+  pInternetSession->UnregisterNameSpace(pClassFactory, lpszScheme);
 
   // and remove from map
   m_ClassFactories.RemoveKey(lpszScheme);

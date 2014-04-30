@@ -1,9 +1,3 @@
-/****************************************************************************
- * Buffer.cpp : Implementation of Buffer and URLMemoryResource
- * Copyright 2013 Salsita Software (http://www.salsitasoft.com).
- * Author: Arne Seib <arne@salsitasoft.com>
- ****************************************************************************/
-
 #include "StdAfx.h"
 #include "Buffer.h"
 
@@ -151,3 +145,4 @@ void URLMemoryResource::setData(LPCVOID aDataBuffer, DWORD aLength, LPCWSTR aMim
   memcpy(mData, aDataBuffer, aLength);
   mimeType = aMimeType;
 }
+

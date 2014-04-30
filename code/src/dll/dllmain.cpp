@@ -7,7 +7,7 @@
 #include "stdafx.h"
 #include "resource.h"
 #include "ProtocolLibrary_i.h"
-#include "Application.h"
+#include "patching/Application.h"
 #include "dllmain.h"
 
 ProtocolLibraryModule _AtlModule;

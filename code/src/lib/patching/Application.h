@@ -5,7 +5,7 @@
  ****************************************************************************/
 #pragma once
 
-#include "resource.h"       // main symbols
+#include "../dll/resource.h"       // main symbols
 #include "ProtocolLibrary_i.h"
 #include "ClassFactories.h"
 #include <map>

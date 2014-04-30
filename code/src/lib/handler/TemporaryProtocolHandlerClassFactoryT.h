@@ -71,8 +71,7 @@ public:
     IUnknown *pUnkOuter,
     REFIID riid, void **ppvObject)
   {
-    if (pUnkOuter)
-    {
+    if (pUnkOuter) {
       // we don't support aggregation
       return CLASS_E_NOAGGREGATION;
     }
@@ -81,9 +80,7 @@ public:
     CComObject<H> *pHandler = NULL;
 
     // create the handler instance
-    IF_FAILED_RET(
-      CComObject<H>::CreateInstance(&pHandler)
-    );
+    IF_FAILED_RET(CComObject<H>::CreateInstance(&pHandler));
 
     // make lifetime management safe
     CComPtr<IInternetProtocol> pInternetProtocol = pHandler;
@@ -109,8 +106,7 @@ protected:
   HRESULT Init(
     LPCWSTR lpszScheme)
   {
-    if (!wcslen(lpszScheme))
-    {
+    if (!wcslen(lpszScheme)) {
       return E_INVALIDARG;
     }
     m_sScheme = lpszScheme;

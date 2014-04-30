@@ -5,12 +5,12 @@
  ****************************************************************************/
 #pragma once
 
-#include "resource.h"       // main symbols
+#include "../dll/resource.h"       // main symbols
 #include <string>
 #include <set>
 #include <vector>
 #include "ProtocolLibrary_i.h"
-#include "http_parser.h"
+#include "../http-parser-master/http_parser.h"
 
 namespace protocolpatchLib
 {
