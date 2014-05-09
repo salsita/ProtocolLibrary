@@ -317,13 +317,18 @@ STDMETHODIMP ProtocolSink::BeginningTransaction(
     return hr;
   }
   if (FAILED(hr)) {
+    if (m_spInternetProtocolSink) {
+      m_spInternetProtocolSink->ReportResult(hr, 0, NULL);
+    }
     return hr;
   }
-
   ProtocolSink_TRACE(L"fire_onBeforeSendHeaders %s", szURL);
   // then fire onBeforeSendHeaders
   hr = mRequestRecord.fire_onBeforeSendHeaders(m_bindVerb, sHdrs);
   if (FAILED(hr)) {
+    if (m_spInternetProtocolSink) {
+      m_spInternetProtocolSink->ReportResult(hr, 0, NULL);
+    }
     return hr;
   }
 
@@ -337,8 +342,12 @@ STDMETHODIMP ProtocolSink::BeginningTransaction(
     sHdrs += additionalHeaders;
     ::CoTaskMemFree(additionalHeaders);
   }
+
   LPWSTR wszAdditionalHeaders = (LPWSTR) CoTaskMemAlloc((sHdrs.GetLength()+1)*sizeof(WCHAR));
   if (!wszAdditionalHeaders) {
+    if (m_spInternetProtocolSink) {
+      m_spInternetProtocolSink->ReportResult(E_OUTOFMEMORY, 0, NULL);
+    }
     return E_OUTOFMEMORY;
   }
 
