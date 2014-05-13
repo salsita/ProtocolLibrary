@@ -30,6 +30,10 @@
 
 using namespace ATL;
 
+#ifndef MAXINT
+#define MAXINT INT_MAX
+#endif
+
 #include "Buffer.h"
 
 #ifndef IF_FAILED_RET

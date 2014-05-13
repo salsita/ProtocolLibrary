@@ -318,8 +318,7 @@
     <ClInclude Include="src\dll\dllmain.h" />
     <ClInclude Include="src\dll\Resource.h" />
     <ClInclude Include="$(GeneratedFilesFolder)\..\ProtocolLibrary_lib\ProtocolLibrary_i.h" />
-    <ClInclude Include="include\targetver.h" />
-    <ClInclude Include="src\dll\stdafx.h" />
+    <ClInclude Include="src\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\ProtocolLibrary.rc" />

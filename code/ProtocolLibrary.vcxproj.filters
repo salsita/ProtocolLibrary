@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="include">
-      <UniqueIdentifier>{8D1AEB45-4ED9-421D-AC7D-4B718B07BAFA}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{9DA55E41-6126-4EF7-ACB8-89A22B0C5720}</UniqueIdentifier>
     </Filter>
@@ -27,20 +24,17 @@
     <ClCompile Include="$(GeneratedFilesFolder)\..\ProtocolLibrary_lib\ProtocolLibrary_i.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\targetver.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="src\dll\Resource.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\dll\dllmain.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\dll\stdafx.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="$(GeneratedFilesFolder)\..\ProtocolLibrary_lib\ProtocolLibrary_i.h" />
+    <ClInclude Include="src\stdafx.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ProtocolLibrary.def" />
