@@ -278,7 +278,7 @@
     <None Include="src\lib\papp\SinkPolicy.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\targetver.h" />
+    <ClInclude Include="include\Buffer.h" />
     <ClInclude Include="src\lib\handler\ProtocolHandlerRegistrar.h" />
     <ClInclude Include="src\lib\handler\TemporaryProtocolFolderHandler.h" />
     <ClInclude Include="src\lib\handler\TemporaryProtocolFolderHandlerClassFactory.h" />

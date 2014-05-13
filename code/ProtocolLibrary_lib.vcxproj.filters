@@ -4,9 +4,6 @@
     <ClInclude Include="src\stdafx.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="include\targetver.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="src\lib\handler\ProtocolHandlerRegistrar.h">
       <Filter>src\handler</Filter>
     </ClInclude>
@@ -88,6 +85,9 @@
     <ClInclude Include="src\lib\patching\VTablePatch.h">
       <Filter>src\patching</Filter>
     </ClInclude>
+    <ClInclude Include="include\Buffer.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\lib\stdafx.cpp">
@@ -143,9 +143,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="include">
-      <UniqueIdentifier>{D4AE576A-6435-4506-B685-EDFE23687EB5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{856485B5-B140-4A60-BFD4-59F852CB7A05}</UniqueIdentifier>
     </Filter>
