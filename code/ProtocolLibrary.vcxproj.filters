@@ -21,7 +21,7 @@
     <ClCompile Include="src\dll\dllmain.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="$(GeneratedFilesFolder)\..\ProtocolLibrary_lib\ProtocolLibrary_i.c" />
+    <ClCompile Include="$(GeneratedFilesFolder)..\ProtocolLibrary_lib\ProtocolLibrary_i.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\dll\Resource.h">
@@ -31,7 +31,7 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="resources\resource.h" />
-    <ClInclude Include="$(GeneratedFilesFolder)\..\ProtocolLibrary_lib\ProtocolLibrary_i.h" />
+    <ClInclude Include="$(GeneratedFilesFolder)..\ProtocolLibrary_lib\ProtocolLibrary_i.h" />
     <ClInclude Include="src\stdafx.h">
       <Filter>src</Filter>
     </ClInclude>
