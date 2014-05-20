@@ -88,6 +88,12 @@
     <ClInclude Include="include\Buffer.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\handler\TemporaryProtocolCustomHandlerClassFactory.h">
+      <Filter>src\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\handler\Interfaces.h">
+      <Filter>src\handler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\lib\stdafx.cpp">

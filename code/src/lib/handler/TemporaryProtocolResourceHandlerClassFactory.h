@@ -24,6 +24,7 @@ class ATL_NO_VTABLE CTemporaryProtocolResourceHandlerClassFactory :
 {
 public:
   friend class CProtocolHandlerRegistrar;
+  typedef CComObject<CTemporaryProtocolResourceHandlerClassFactory> _ComObject;
 
   //----------------------------------------------------------------------------
   // com stuff
@@ -37,25 +38,20 @@ public:
   HRESULT FinalConstruct();
   void FinalRelease();
 
+  //----------------------------------------------------------------------------
+  // IProtocolClassFactory implementation
+  STDMETHOD(AddHost)(
+    LPCWSTR aHostname,
+    VARIANT vtValue);
+
 public:
   //-------------------------------------------------------------------------
   // called from CTemporaryProtocolHandlerClassFactoryT when creating a new
   // protocol handler instance to allow initialization
   HRESULT InitHandler(CTemporaryProtocolResourceHandler * pHandler);
 
-protected:
-  // called from CProtocolHandlerRegistrar
-  // adds a host with the host name and a file name of a DLL or EXE file to
-  // load the resources from
-  HRESULT AddHost(
-    LPCWSTR   lpszHost,
-    LPCWSTR   lpszFileName);
-
-  //-------------------------------------------------------------------------
-  // called from CProtocolHandlerRegistrar
-  // adds a host with the host name and an instance handle to load the
-  // resources from
-  HRESULT AddHost(
+private:
+  HRESULT AddHostResource(
     LPCWSTR   lpszHost,
     HINSTANCE hInstResources);
 

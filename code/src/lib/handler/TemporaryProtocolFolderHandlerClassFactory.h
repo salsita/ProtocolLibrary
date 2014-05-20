@@ -25,6 +25,7 @@ class ATL_NO_VTABLE CTemporaryProtocolFolderHandlerClassFactory :
 {
 public:
   friend class CProtocolHandlerRegistrar;
+  typedef CComObject<CTemporaryProtocolFolderHandlerClassFactory> _ComObject;
 
   //----------------------------------------------------------------------------
   // com stuff
@@ -56,13 +57,11 @@ public:
       IUri * aUri,
       URLMemoryResource & aRetBuffer);
 
-protected:
-  // called from CProtocolHandlerRegistrar
-  // adds a host with the host name and a folder name to load the resources
-  // from
-  HRESULT AddHost(
-    LPCWSTR   lpszHost,
-    LPCWSTR   lpszFolderName);
+  //----------------------------------------------------------------------------
+  // IProtocolClassFactory implementation
+  STDMETHOD(AddHost)(
+    LPCWSTR aHostname,
+    VARIANT vtValue);
 
 private:
   //----------------------------------------------------------------------------

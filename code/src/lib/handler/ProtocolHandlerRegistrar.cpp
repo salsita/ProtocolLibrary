@@ -9,6 +9,7 @@
 #include "TemporaryProtocolFolderHandlerClassFactory.h"
 #include "TemporaryProtocolResourceHandler.h"
 #include "TemporaryProtocolResourceHandlerClassFactory.h"
+#include "TemporaryProtocolCustomHandlerClassFactory.h"
 #include "ProtocolHandlerRegistrar.h"
 
 /*****************************************************************************
@@ -42,8 +43,8 @@ HRESULT CProtocolHandlerRegistrar::RegisterTemporaryFolderHandler(
   LPCWSTR lpszFolder)
 {
   return GetInstance().
-    RegisterTemporaryHandler<CTemporaryProtocolFolderHandlerClassFactory, LPCWSTR>
-    (lpszScheme, lpszHost, lpszFolder);
+    RegisterTemporaryHandler<CTemporaryProtocolFolderHandlerClassFactory>
+    (lpszScheme, lpszHost, CComVariant(lpszFolder));
 }
 
 //---------------------------------------------------------------------------
@@ -54,8 +55,8 @@ HRESULT CProtocolHandlerRegistrar::RegisterTemporaryResourceHandler(
   LPCWSTR lpszResourceFileName)
 {
   return GetInstance().
-    RegisterTemporaryHandler<CTemporaryProtocolResourceHandlerClassFactory, LPCWSTR>
-    (lpszScheme, lpszHost, lpszResourceFileName);
+    RegisterTemporaryHandler<CTemporaryProtocolResourceHandlerClassFactory>
+    (lpszScheme, lpszHost, CComVariant(lpszResourceFileName));
 }
 
 //---------------------------------------------------------------------------
@@ -65,9 +66,24 @@ HRESULT CProtocolHandlerRegistrar::RegisterTemporaryResourceHandler(
   LPCWSTR   lpszHost,
   HINSTANCE hInstResources)
 {
+  VARIANT vt;
+  vt.vt = VT_BYREF;
+  vt.byref = reinterpret_cast<PVOID>(hInstResources);
   return GetInstance().
-    RegisterTemporaryHandler<CTemporaryProtocolResourceHandlerClassFactory, HINSTANCE>
-    (lpszScheme, lpszHost, hInstResources);
+    RegisterTemporaryHandler<CTemporaryProtocolResourceHandlerClassFactory>
+    (lpszScheme, lpszHost, vt);
+}
+
+//---------------------------------------------------------------------------
+// RegisterTemporaryCustomHandler
+HRESULT CProtocolHandlerRegistrar::RegisterTemporaryCustomHandler(
+  LPCWSTR   lpszScheme,
+  IProtocolClassFactory * aClassFactory,
+  REFCLSID rclsid)
+{
+  return GetInstance().
+    RegisterTemporaryHandler<CTemporaryProtocolCustomHandlerClassFactory>
+    (lpszScheme, nullptr, CComVariant(), aClassFactory);
 }
 
 //---------------------------------------------------------------------------
@@ -88,6 +104,16 @@ HRESULT CProtocolHandlerRegistrar::UnregisterTemporaryResourceHandler(
 {
   return GetInstance().
     UnregisterTemporaryHandler<CTemporaryProtocolResourceHandlerClassFactory>(lpszScheme, lpszHost);
+}
+
+//---------------------------------------------------------------------------
+// UnregisterTemporaryCustomHandler
+HRESULT CProtocolHandlerRegistrar::UnregisterTemporaryCustomHandler(
+  LPCWSTR lpszScheme,
+  IProtocolClassFactory * aClassFactory)
+{
+  return GetInstance().
+    UnregisterTemporaryHandler<CTemporaryProtocolCustomHandlerClassFactory>(lpszScheme, nullptr, aClassFactory);
 }
 
 //---------------------------------------------------------------------------
@@ -116,7 +142,7 @@ HRESULT CProtocolHandlerRegistrar::InternalAddResource(
 
   CritSectLock lock(m_CriticalSection);
 
-  CComPtr<IClassFactory> pClassFactory;
+  CComPtr<IProtocolClassFactory> pClassFactory;
 
   CComBSTR scheme, host;
   IF_FAILED_RET(pURI->GetSchemeName(&scheme));
@@ -140,38 +166,49 @@ HRESULT CProtocolHandlerRegistrar::InternalAddResource(
 
 //---------------------------------------------------------------------------
 // RegisterTemporaryHandler
-template<class CF, class RT>
+template<class CF>
 HRESULT CProtocolHandlerRegistrar::RegisterTemporaryHandler(
   LPCWSTR lpszScheme,
   LPCWSTR lpszHost,
-  RT      tResourceID)
+  VARIANT & aResourceId,
+  IProtocolClassFactory * aClassFactory)
 {
   CritSectLock lock(m_CriticalSection);
   BOOL registered = FALSE;
 
-  CComObject<CF> *pHandlerFactory = NULL;
-  CComPtr<IClassFactory> pClassFactory;
+  CComQIPtr<IProtocolClassFactory> classFactory(aClassFactory);
 
-  // lookup class factory for lpszScheme
-  if (!m_ClassFactories.Lookup(lpszScheme, pClassFactory)) {
-    // don't have yet, create class factory object
-    IF_FAILED_RET(CComObject<CF>
-      ::CreateInstance(&pHandlerFactory));
-
-    pClassFactory = pHandlerFactory;
-
-    // init classfactory object
-    IF_FAILED_RET(pHandlerFactory->Init(
-      lpszScheme));
+  CComPtr<IProtocolClassFactory> classFactoryFound;
+  registered = m_ClassFactories.Lookup(lpszScheme, classFactoryFound);
+  if (!registered) {
+    // classfactory for scheme is not registered yet
+    if (nullptr == classFactory) {
+      // no classfactory given, create one
+      __if_exists (CF::CreateCFInstance) {
+        IF_FAILED_RET(CF::CreateCFInstance(classFactory));
+        // init classfactory object
+        IF_FAILED_RET(classFactory->Init(lpszScheme));
+      }
+    }
+    // else: aClassFactory is provided, fall through
   }
   else {
-    // have class factory
-    registered = TRUE;
-    pHandlerFactory = (CComObject<CF> *)pClassFactory.p;
+    // already registered:
+    if (classFactory && !classFactory.IsEqualObject(classFactoryFound)) {
+      // not allowed to replace an existing class factory!
+      return E_INVALIDARG;
+    }
+    classFactory = classFactoryFound;
+  }
+
+
+  // now we should have a classfactory in any case
+  if (!classFactory) {
+    return E_INVALIDARG;
   }
 
   // add the host
-  IF_FAILED_RET(pHandlerFactory->AddHost(lpszHost, tResourceID));
+  IF_FAILED_RET(classFactory->AddHost(lpszHost, aResourceId));
 
   // register protocol handler
   if (!registered) {
@@ -180,13 +217,13 @@ HRESULT CProtocolHandlerRegistrar::RegisterTemporaryHandler(
     IF_FAILED_RET(CoInternetGetSession(0, &pInternetSession, 0));
 
     IF_FAILED_RET(pInternetSession->RegisterNameSpace(
-      pClassFactory,
+      classFactory,
       CTemporaryProtocolFolderHandler::CLSID,
       lpszScheme,
       0, NULL, 0));
 
     // store classfactory object
-    m_ClassFactories[lpszScheme] = pClassFactory;
+    m_ClassFactories[lpszScheme] = classFactory;
   }
 
   return S_OK;
@@ -197,35 +234,40 @@ HRESULT CProtocolHandlerRegistrar::RegisterTemporaryHandler(
 template<class CF>
 HRESULT CProtocolHandlerRegistrar::UnregisterTemporaryHandler(
   LPCWSTR lpszScheme,
-  LPCWSTR lpszHost)
+  LPCWSTR lpszHost,
+  IProtocolClassFactory * aClassFactory)
 {
+  HRESULT found = S_FALSE;  // not found
   CritSectLock lock(m_CriticalSection);
   // lookup classfactory object for lpszHost
-  CComPtr<IClassFactory> pClassFactory;
-  if (!m_ClassFactories.Lookup(lpszScheme, pClassFactory)) {
-    // not found
-    return S_FALSE;
-  }
+  CComPtr<IProtocolClassFactory> pClassFactory(aClassFactory);
 
-  // unregister host
-  CComObject<CF> * pHandlerFactory = (CComObject<CF> *)pClassFactory.p;
-  size_t registeredHosts = pHandlerFactory->RemoveHost(lpszHost);
-  if (registeredHosts > 0) {
-    // the handler has still registered hosts
-    return S_OK;
+  __if_exists(CF::RemoveHost) {
+    if ( (nullptr == aClassFactory) && m_ClassFactories.Lookup(lpszScheme, pClassFactory) ) {
+      found = S_OK;
+      // unregister host
+      CComObject<CF> * pHandlerFactory = (CComObject<CF> *)pClassFactory.p;
+      size_t registeredHosts = pHandlerFactory->RemoveHost(lpszHost);
+      if (registeredHosts > 0) {
+        // the handler has still registered hosts
+        return found;
+      }
+    }
   }
 
   // there are no more registered hosts, so remove the registration
 
   // get IInternetSession
-  CComPtr<IInternetSession> pInternetSession;
-  IF_FAILED_RET(CoInternetGetSession(0, &pInternetSession, 0));
+  if (nullptr != pClassFactory) {
+    CComPtr<IInternetSession> pInternetSession;
+    IF_FAILED_RET(CoInternetGetSession(0, &pInternetSession, 0));
 
-  // unregister
-  pInternetSession->UnregisterNameSpace(pClassFactory, lpszScheme);
+    // unregister
+    pInternetSession->UnregisterNameSpace(pClassFactory, lpszScheme);
+  }
 
   // and remove from map
   m_ClassFactories.RemoveKey(lpszScheme);
 
-  return S_OK;
+  return found;
 }

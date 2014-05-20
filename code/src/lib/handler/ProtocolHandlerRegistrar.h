@@ -7,6 +7,7 @@
 #pragma once
 
 #include <atlcoll.h>
+#include "interfaces.h"
 
 /*****************************************************************************
  * class CProtocolHandlerRegistrar
@@ -52,6 +53,12 @@ public:
     HINSTANCE hInstResources);
 
   //-------------------------------------------------------------------------
+  static HRESULT RegisterTemporaryCustomHandler(
+    LPCWSTR   lpszScheme,
+    IProtocolClassFactory * aClassFactory,
+    REFCLSID rclsid);
+
+  //-------------------------------------------------------------------------
   // unregisters a file protocol previously registered with
   // one of the RegisterTemporaryXXXHandler methods
   static HRESULT UnregisterTemporaryFolderHandler(
@@ -64,6 +71,11 @@ public:
   static HRESULT UnregisterTemporaryResourceHandler(
     LPCWSTR lpszScheme,
     LPCWSTR lpszHost);
+
+  //-------------------------------------------------------------------------
+  static HRESULT UnregisterTemporaryCustomHandler(
+    LPCWSTR lpszScheme,
+    IProtocolClassFactory * aClassFactory);
 
   //-------------------------------------------------------------------------
   // adds a URL where the content resides in memory.
@@ -85,10 +97,11 @@ private:
   // CTemporaryProtocolResourceHandlerClassFactory)
   // RT is the type of the resource identifyer argument (e.g. a LPCWSTR for
   // folder / filenames, HINSTANCE for resource instance handle)
-  template<class CF, class RT> HRESULT RegisterTemporaryHandler(
+  template<class CF> HRESULT RegisterTemporaryHandler(
     LPCWSTR lpszScheme,
     LPCWSTR lpszHost,
-    RT      tResourceID);
+    VARIANT & aResourceId,
+    IProtocolClassFactory * aClassFactory = nullptr);
 
   //-------------------------------------------------------------------------
   // internal unregistration function, called from
@@ -96,7 +109,8 @@ private:
   // UnregisterTemporaryFolderHandler.
   template<class CF> HRESULT UnregisterTemporaryHandler(
     LPCWSTR lpszScheme,
-    LPCWSTR lpszHost);
+    LPCWSTR lpszHost,
+    IProtocolClassFactory * aClassFactory = nullptr);
 
   //-------------------------------------------------------------------------
   // non static version of AddResource
@@ -110,5 +124,5 @@ private:
   CRITICAL_SECTION      m_CriticalSection;
 
   // map holding all temporary protocols (their class factories)
-  CAtlMap<CStringW, CComPtr<IClassFactory> >  m_ClassFactories;
+  CAtlMap<CStringW, CComPtr<IProtocolClassFactory> >  m_ClassFactories;
 };

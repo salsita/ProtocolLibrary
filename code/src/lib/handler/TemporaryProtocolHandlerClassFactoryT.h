@@ -2,38 +2,30 @@
 
 #include <atlcoll.h>
 
-/*****************************************************************************
- * Interface IProtocolMemoryResource
- *  Adds support for special URLs - URLs that don't exist pysically.
- *  The data for these resources comes directly from a memory buffer.
- *****************************************************************************/
-MIDL_INTERFACE("D3C4D0CB-DEC9-4529-8DDD-8F441E76D584")
-IProtocolMemoryResource : public IUnknown
-{
-public:
-    STDMETHOD(AddResource)(
-        IUri * aURI,
-        LPCVOID lpData,
-        DWORD dwLength,
-        LPCWSTR lpszMimeType) PURE;
-
-    STDMETHOD(GetResource)(
-        IUri * aUri,
-        URLMemoryResource & aRetBuffer) PURE;
-
-};
+#include "interfaces.h"
 
 /*****************************************************************************
  * class CTemporaryProtocolHandlerClassFactoryT
- *  Implements IClassFactory.
+ *  Implements IProtocolClassFactory.
  *  Creates instances of CTemporaryProtocolFolderHandler.
  *****************************************************************************/
 template<class T, class H, class HI>
   class ATL_NO_VTABLE CTemporaryProtocolHandlerClassFactoryT :
-    public IClassFactory
+    public IProtocolClassFactory
 {
 public:
   friend class CProtocolHandlerRegistrar;
+
+  static HRESULT CreateCFInstance(CComPtr<IProtocolClassFactory> & aRetVal)
+  {
+    T::_ComObject * newInstance = nullptr;
+    HRESULT hr = T::_ComObject::CreateInstance(&newInstance);
+    if (FAILED(hr)) {
+      return hr;
+    }
+    aRetVal = newInstance;
+    return S_OK;
+  }
 
   //----------------------------------------------------------------------------
   // CTOR / DTOR
@@ -99,37 +91,41 @@ public:
     return S_OK;
   }
 
-protected:
   //----------------------------------------------------------------------------
-  // called from CProtocolHandlerRegistrar
-  // initializes the class factory with the protocol string
-  HRESULT Init(
-    LPCWSTR lpszScheme)
+  // IProtocolClassFactory implementation
+  STDMETHOD(Init)(
+    LPCWSTR aScheme)
   {
-    if (!wcslen(lpszScheme)) {
+    if (!wcslen(aScheme)) {
       return E_INVALIDARG;
     }
-    m_sScheme = lpszScheme;
-
+    m_sScheme = aScheme;
     return S_OK;
   }
 
-  //-------------------------------------------------------------------------
-  // called from CProtocolHandlerRegistrar
-  // removes a host from the internal map
-  size_t RemoveHost(
-    LPCWSTR lpszHost)
+  STDMETHOD_(size_t, RemoveHost)(
+    LPCWSTR aHostname)
   {
     CritSectLock lock(m_CriticalSection);
-    m_HostInfos.RemoveKey(lpszHost);
+    m_HostInfos.RemoveKey(aHostname);
     return m_HostInfos.GetCount();
   }
+
+protected:
+  //----------------------------------------------------------------------------
 
   // lookup a host
   BOOL LookupHostInfo(CStringW key, HI & val)
   {
     CritSectLock lock(m_CriticalSection);
     return m_HostInfos.Lookup(key, val);
+  }
+
+  // check if a host exists
+  BOOL HaveHostInfo(CStringW key)
+  {
+    CritSectLock lock(m_CriticalSection);
+    return (m_HostInfos.Lookup(key) != nullptr);
   }
 
   // set a host

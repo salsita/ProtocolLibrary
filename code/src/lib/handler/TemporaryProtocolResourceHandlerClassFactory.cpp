@@ -28,29 +28,42 @@ void CTemporaryProtocolResourceHandlerClassFactory::FinalRelease()
 
 //-------------------------------------------------------------------------
 // AddHost
-HRESULT CTemporaryProtocolResourceHandlerClassFactory::AddHost(
-  LPCWSTR lpszHost,
-  LPCWSTR lpszFileName)
+STDMETHODIMP CTemporaryProtocolResourceHandlerClassFactory::AddHost(
+  LPCWSTR aHostname,
+  VARIANT vtValue)
 {
-  // load resource file
-  // note that the library stays loaded until the process terminates
-  HINSTANCE hInstResources =
-        ::LoadLibraryEx(lpszFileName, NULL, LOAD_LIBRARY_AS_DATAFILE);
-  if (!hInstResources) {
-    DWORD dw = GetLastError();
-    return HRESULT_FROM_WIN32(dw);
+  // check arguments
+  if (!wcslen(aHostname) || !wcslen(aHostname)) {
+    return E_INVALIDARG;
   }
 
-  HRESULT hr = AddHost(lpszHost, hInstResources);
-  if (FAILED(hr)) {
-    ::FreeLibrary(hInstResources);
+  if (VT_BYREF == vtValue.vt) {
+    // a resource handle
+    return AddHostResource(aHostname, reinterpret_cast<HINSTANCE>(vtValue.byref));
   }
-  return hr;
+  if (VT_BSTR == vtValue.vt) {
+    // a filename
+    // load resource file
+    // note that the library stays loaded until the process terminates
+    HINSTANCE hInstResources =
+        ::LoadLibraryExW(vtValue.bstrVal, NULL, LOAD_LIBRARY_AS_DATAFILE);
+    if (!hInstResources) {
+      DWORD dw = GetLastError();
+      return HRESULT_FROM_WIN32(dw);
+    }
+
+    HRESULT hr = AddHostResource(aHostname, hInstResources);
+    if (FAILED(hr)) {
+      ::FreeLibrary(hInstResources);
+    }
+    return hr;
+  }
+  return E_INVALIDARG;
 }
 
 //---------------------------------------------------------------------------
 // AddHost
-HRESULT CTemporaryProtocolResourceHandlerClassFactory::AddHost(
+HRESULT CTemporaryProtocolResourceHandlerClassFactory::AddHostResource(
   LPCWSTR   lpszHost,
   HINSTANCE hInstResources)
 {

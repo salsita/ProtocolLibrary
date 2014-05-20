@@ -28,33 +28,37 @@ void CTemporaryProtocolFolderHandlerClassFactory::FinalRelease()
 
 //-------------------------------------------------------------------------
 // AddHost
-HRESULT CTemporaryProtocolFolderHandlerClassFactory::AddHost(
-  LPCWSTR lpszHost,
-  LPCWSTR lpszFolderName)
+STDMETHODIMP CTemporaryProtocolFolderHandlerClassFactory::AddHost(
+  LPCWSTR aHostname,
+  VARIANT vtValue)
 {
-  CritSectLock lock(m_CriticalSection);
-
   // check arguments
-  if (!wcslen(lpszHost) || !wcslen(lpszFolderName)) {
+  if (!wcslen(aHostname) || !wcslen(aHostname)) {
+    return E_INVALIDARG;
+  }
+  if (VT_BSTR != vtValue.vt) {
     return E_INVALIDARG;
   }
 
+  CStringW folderName = vtValue.bstrVal;
+  CritSectLock lock(m_CriticalSection);
+
   // lookup host if we have already
   FolderHandlerHostInfo hostInfo;
-  if (LookupHostInfo(lpszHost, hostInfo)) {
+  if (LookupHostInfo(aHostname, hostInfo)) {
     // found
     return S_FALSE;
   }
 
-  hostInfo.hostName = lpszHost;
-  hostInfo.folderName = lpszFolderName;
+  hostInfo.hostName = aHostname;
+  hostInfo.folderName = folderName;
 
   // append backslash to folder
   PathAddBackslash(hostInfo.folderName.GetBuffer(MAX_PATH));
   hostInfo.folderName.ReleaseBuffer();
 
   // add to map
-  SetHostInfo(lpszHost, hostInfo);
+  SetHostInfo(aHostname, hostInfo);
 
   return S_OK;
 }
