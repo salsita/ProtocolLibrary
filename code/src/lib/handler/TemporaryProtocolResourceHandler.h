@@ -8,6 +8,7 @@
 #pragma once
 
 #include "TemporaryProtocolHandlerT.h"
+#include <ResourceReader.h>
 
 //-------------------------------------------------------------------------
 // struct ResourceHandlerHostInfo : contains the host related data
@@ -33,7 +34,7 @@ typedef CTemporaryProtocolHandlerT
  *  This is the actual protocol handler.
  *****************************************************************************/
 class ATL_NO_VTABLE CTemporaryProtocolResourceHandler :
-  public SeekableBuffer,
+  public ResourceReader,
   public CTemporaryProtocolResourceHandlerBase,
   public CComObjectRootEx<CComSingleThreadModel>
 {
@@ -79,7 +80,7 @@ public:
 protected:
   //-------------------------------------------------------------------------
   // called from CTemporaryProtocolHandlerT to get the hostname
-  HRESULT InitializeRequest(LPCWSTR lpszPath, DWORD & dwSize);
+  HRESULT InitializeRequest(LPCWSTR lpszPath, DWORD & dwSize, CStringW & aMimeType);
 
 private:
   //-------------------------------------------------------------------------
@@ -88,10 +89,4 @@ private:
 
   //-------------------------------------------------------------------------
   // private data members
-
-  // Current resource
-  HRSRC     m_hrc;
-
-  // HGLOBAL for current resource
-  HGLOBAL   m_hGlobalResource;
 };

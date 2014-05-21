@@ -78,7 +78,7 @@ public:
 protected:
   //-------------------------------------------------------------------------
   // called from CTemporaryProtocolHandlerT in Start(..)
-  HRESULT InitializeRequest(LPCWSTR lpszPath, DWORD & dwSize);
+  HRESULT InitializeRequest(LPCWSTR lpszPath, DWORD & dwSize, CStringW & aMimeType);
 
 private:
   //-------------------------------------------------------------------------

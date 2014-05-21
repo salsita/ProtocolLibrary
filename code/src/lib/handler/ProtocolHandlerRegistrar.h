@@ -55,8 +55,9 @@ public:
   //-------------------------------------------------------------------------
   static HRESULT RegisterTemporaryCustomHandler(
     LPCWSTR   lpszScheme,
-    IProtocolClassFactory * aClassFactory,
-    REFCLSID rclsid);
+    LPCWSTR   lpszHost,
+    VARIANT   aResourceId,
+    IProtocolClassFactory * aClassFactory);
 
   //-------------------------------------------------------------------------
   // unregisters a file protocol previously registered with
@@ -75,7 +76,7 @@ public:
   //-------------------------------------------------------------------------
   static HRESULT UnregisterTemporaryCustomHandler(
     LPCWSTR lpszScheme,
-    IProtocolClassFactory * aClassFactory);
+    LPCWSTR   lpszHost);
 
   //-------------------------------------------------------------------------
   // adds a URL where the content resides in memory.
@@ -109,8 +110,7 @@ private:
   // UnregisterTemporaryFolderHandler.
   template<class CF> HRESULT UnregisterTemporaryHandler(
     LPCWSTR lpszScheme,
-    LPCWSTR lpszHost,
-    IProtocolClassFactory * aClassFactory = nullptr);
+    LPCWSTR lpszHost);
 
   //-------------------------------------------------------------------------
   // non static version of AddResource

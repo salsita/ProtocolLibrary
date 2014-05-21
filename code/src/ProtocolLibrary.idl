@@ -300,6 +300,17 @@ library protocolpatchLib
       [in] HINSTANCE hInstResources);
 
     //-------------------------------------------------------------------------
+    // registers a temporary resource protocol of the form
+    // lpszScheme://lpszHost/
+    // where hInstResources is a module handle of the file (DLL or exe) holding
+    // the resources
+    HRESULT RegisterTemporaryCustomHandler(
+      [in] LPCOLESTR   lpszScheme,
+      [in] LPCOLESTR   lpszHost,
+      [in] VARIANT     aResourceId,
+      [in] IClassFactory * aClassFactory);
+
+    //-------------------------------------------------------------------------
     // unregisters a file protocol previously registered with
     // one of the RegisterTemporaryXXXHandler methods
     HRESULT UnregisterTemporaryFolderHandler(
@@ -310,6 +321,13 @@ library protocolpatchLib
     // unregisters a resource protocol previously registered with
     // one of the RegisterTemporaryXXXHandler methods
     HRESULT UnregisterTemporaryResourceHandler(
+      [in] LPCOLESTR lpszScheme,
+      [in] LPCOLESTR lpszHost);
+
+    //-------------------------------------------------------------------------
+    // unregisters a resource protocol previously registered with
+    // one of the RegisterTemporaryXXXHandler methods
+    HRESULT UnregisterTemporaryCustomHandler(
       [in] LPCOLESTR lpszScheme,
       [in] LPCOLESTR lpszHost);
 

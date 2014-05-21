@@ -88,10 +88,10 @@
     <ClInclude Include="include\Buffer.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\handler\TemporaryProtocolCustomHandlerClassFactory.h">
+    <ClInclude Include="src\lib\handler\Interfaces.h">
       <Filter>src\handler</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\handler\Interfaces.h">
+    <ClInclude Include="include\ResourceReader.h">
       <Filter>src\handler</Filter>
     </ClInclude>
   </ItemGroup>

@@ -43,7 +43,7 @@ void CTemporaryProtocolFolderHandler::FinalRelease()
 //---------------------------------------------------------------------------
 // InitializeRequest
 HRESULT CTemporaryProtocolFolderHandler::InitializeRequest(
-  LPCWSTR lpszPath, DWORD & dwSize)
+  LPCWSTR lpszPath, DWORD & dwSize, CStringW & aMimeType)
 {
   // compose absolute file name and strip leading '/' from incoming path
   CStringW sFileName(m_HostInfo.folderName + (lpszPath+1));

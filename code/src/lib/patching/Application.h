@@ -90,6 +90,17 @@ public:
     HINSTANCE hInstResources);
 
   //-------------------------------------------------------------------------
+  // registers a temporary resource protocol of the form
+  // lpszScheme://lpszHost/
+  // where hInstResources is a module handle of the file (DLL or exe) holding
+  // the resources
+  STDMETHOD(RegisterTemporaryCustomHandler)(
+    LPCOLESTR   lpszScheme,
+    LPCOLESTR   lpszHost,
+    VARIANT     aResourceId,
+    IClassFactory * aClassFactory);
+
+  //-------------------------------------------------------------------------
   // unregisters a file protocol previously registered with
   // one of the RegisterTemporaryXXXHandler methods
   STDMETHOD(UnregisterTemporaryFolderHandler)(
@@ -100,6 +111,13 @@ public:
   // unregisters a resource protocol previously registered with
   // one of the RegisterTemporaryXXXHandler methods
   STDMETHOD(UnregisterTemporaryResourceHandler)(
+    LPCOLESTR lpszScheme,
+    LPCOLESTR lpszHost);
+
+  //-------------------------------------------------------------------------
+  // unregisters a resource protocol previously registered with
+  // one of the RegisterTemporaryXXXHandler methods
+  STDMETHOD(UnregisterTemporaryCustomHandler)(
     LPCOLESTR lpszScheme,
     LPCOLESTR lpszHost);
 

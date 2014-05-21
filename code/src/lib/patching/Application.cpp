@@ -127,6 +127,25 @@ STDMETHODIMP Application::RegisterTemporaryResourceHandlerInstance(
 }
 
 //-------------------------------------------------------------------------
+// registers a temporary resource protocol of the form
+// lpszScheme://lpszHost/
+// where hInstResources is a module handle of the file (DLL or exe) holding
+// the resources
+STDMETHODIMP Application::RegisterTemporaryCustomHandler(
+  LPCOLESTR   lpszScheme,
+  LPCOLESTR   lpszHost,
+  VARIANT     aResourceId,
+  IClassFactory * aClassFactory)
+{
+  CComQIPtr<IProtocolClassFactory> classFactory(aClassFactory);
+  if (!classFactory) {
+    return E_NOINTERFACE;
+  }
+  return CProtocolHandlerRegistrar::
+      RegisterTemporaryCustomHandler(lpszScheme, lpszHost, aResourceId, classFactory);
+}
+
+//-------------------------------------------------------------------------
 // unregisters a file protocol previously registered with
 // one of the RegisterTemporaryXXXHandler methods
 STDMETHODIMP Application::UnregisterTemporaryFolderHandler(
@@ -146,6 +165,17 @@ STDMETHODIMP Application::UnregisterTemporaryResourceHandler(
 {
   return CProtocolHandlerRegistrar::
       UnregisterTemporaryResourceHandler(lpszScheme, lpszHost);
+}
+
+//-------------------------------------------------------------------------
+// unregisters a resource protocol previously registered with
+// one of the RegisterTemporaryXXXHandler methods
+STDMETHODIMP Application::UnregisterTemporaryCustomHandler(
+  LPCOLESTR lpszScheme,
+  LPCOLESTR lpszHost)
+{
+  return CProtocolHandlerRegistrar::
+      UnregisterTemporaryCustomHandler(lpszScheme, lpszHost);
 }
 
 //-------------------------------------------------------------------------

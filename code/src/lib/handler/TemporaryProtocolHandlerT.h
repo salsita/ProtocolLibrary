@@ -145,7 +145,7 @@ public:
       }
       else {
         m_SpecialURLResource.clear(); // make sure we don't have stale data
-        IF_FAILED_RET(static_cast<T*>(this)->InitializeRequest(sPath, sz));
+        IF_FAILED_RET(static_cast<T*>(this)->InitializeRequest(sPath, sz, sMime));
       }
 
       // serve the request to pOIProtSink

@@ -20,7 +20,8 @@ public:
  *  The data for these resources comes directly from a memory buffer.
  *****************************************************************************/
 MIDL_INTERFACE("D3C4D0CB-DEC9-4529-8DDD-8F441E76D584")
-IProtocolMemoryResource : public IUnknown
+IProtocolMemoryResource :
+  public IUnknown
 {
 public:
     STDMETHOD(AddResource)(

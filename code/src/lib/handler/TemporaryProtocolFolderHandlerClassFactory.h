@@ -34,6 +34,7 @@ public:
 
   BEGIN_COM_MAP(CTemporaryProtocolFolderHandlerClassFactory)
     COM_INTERFACE_ENTRY(IClassFactory)
+    COM_INTERFACE_ENTRY(IProtocolClassFactory)
     COM_INTERFACE_ENTRY(IProtocolMemoryResource)
   END_COM_MAP()
 

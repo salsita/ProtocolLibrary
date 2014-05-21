@@ -279,9 +279,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Buffer.h" />
+    <ClInclude Include="include\ResourceReader.h" />
     <ClInclude Include="src\lib\handler\Interfaces.h" />
     <ClInclude Include="src\lib\handler\ProtocolHandlerRegistrar.h" />
-    <ClInclude Include="src\lib\handler\TemporaryProtocolCustomHandlerClassFactory.h" />
     <ClInclude Include="src\lib\handler\TemporaryProtocolFolderHandler.h" />
     <ClInclude Include="src\lib\handler\TemporaryProtocolFolderHandlerClassFactory.h" />
     <ClInclude Include="src\lib\handler\TemporaryProtocolHandlerClassFactoryT.h" />

@@ -33,6 +33,7 @@ public:
 
   BEGIN_COM_MAP(CTemporaryProtocolResourceHandlerClassFactory)
     COM_INTERFACE_ENTRY(IClassFactory)
+    COM_INTERFACE_ENTRY(IProtocolClassFactory)
   END_COM_MAP()
 
   HRESULT FinalConstruct();
