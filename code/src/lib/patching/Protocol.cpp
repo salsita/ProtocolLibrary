@@ -10,7 +10,7 @@
 namespace protocolpatchLib
 {
 
-#define LOG_Protocol
+//#define LOG_Protocol
 #ifdef LOG_Protocol
 #define Protocol_TRACE(...) \
   ATLTRACE(__FUNCTION__); \

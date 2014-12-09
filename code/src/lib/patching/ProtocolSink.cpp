@@ -10,7 +10,7 @@
 namespace protocolpatchLib
 {
 
-#define LOG_ProtocolSink
+//#define LOG_ProtocolSink
 #ifdef LOG_ProtocolSink
 #define ProtocolSink_TRACE(...) \
   ATLTRACE(__FUNCTION__); \
